@@ -15,9 +15,9 @@ public abstract class Scoring {
      * @param state
      * @return
      */
-    public static int stateScore (State state, int wins){
+    public static int stateScore (TicTacToeState state, int wins){
         assert (wins > 2) : "Winning series length LT 2.";
-        assert (wins < state.getSize()) : "Winning size not LT table size.";
+        assert (wins < state.getTable().length) : "Winning size not LT table size.";
 
         //int[][] range = getRange(state, wins-1);
         int[][] series = countSeries(state.getTable(), wins);
@@ -29,8 +29,8 @@ public abstract class Scoring {
             score -= series[Player.HUMAN.ordinal()+1][wins-i] * (int)Math.pow(10,4-2*i);
         }
 
-        if (series[Player.COMPUTER.ordinal()+1][wins] != 0) state.setWinner(Optional.of(Player.COMPUTER));
-        if (series[Player.HUMAN.ordinal()+1][wins] != 0) state.setWinner(Optional.of(Player.HUMAN));
+        if (series[Player.COMPUTER.ordinal()+1][wins] != 0) state.setWinner(Player.COMPUTER);
+        if (series[Player.HUMAN.ordinal()+1][wins] != 0) state.setWinner(Player.HUMAN);
 
         return score;
     }

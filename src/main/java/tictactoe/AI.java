@@ -1,5 +1,6 @@
 package tictactoe;
 
+import java.util.LinkedList;
 /**
  * Static collection of functions normally attributed to an "tictactoe.AI".
  */
@@ -12,14 +13,14 @@ public abstract class AI {
      * Selects next step for the computer based on a minimax algorithm. If selection fails, throws Exception.
      * @param state The actual game state on which the computer gets the next step.
      * @return Selected step.
-     * @throws Exception
+     * @throws Exception thrown when a step could not be selected.
      */
-    public static int[] getNextStep (State state, int depth) throws Exception {
+    public static <T> T getNextStep (GameState<T> state, int depth) throws Exception {
         int maxscore = Integer.MIN_VALUE;
-        int[] step = new int[]{-1, -1};
+        T step = null;
 
-
-        for (State st: state.getNextPossibleStates()) {
+        LinkedList<GameState<T>> stl = state.getNextStates();
+        for (GameState<T> st: stl) {
             int minmax = minimaxStep(st, depth);
             //System.out.println(minmax);
             if (minmax > maxscore) {
@@ -28,7 +29,7 @@ public abstract class AI {
             }
         }
 
-        if (maxscore == Integer.MIN_VALUE) throw new Exception("No steps selected.");
+        if (step == null) throw new Exception ("No steps selected.");
         return step;
     }
 
@@ -38,18 +39,18 @@ public abstract class AI {
      * @param depth The algorithm goes this deep on the game's state tree.
      * @return A corrected value of the state (and the last step).
      */
-    private static int minimaxStep(State state, int depth){
+    private static <T> int minimaxStep(GameState<T> state, int depth){
 
         if (depth == 0) return state.getScore();
 
         int minmax = (state.getWhosTurn() == Player.COMPUTER) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
-        for (State st : state.getNextPossibleStates()) {
+        for (GameState<T> st : state.getNextStates()) {
             if (state.getWhosTurn() == Player.COMPUTER) {
-                Math.max (minmax, minimaxStep(st,depth-1));
+                minmax = Math.max (minmax, minimaxStep(st,depth-1));
             }
             else {
-                Math.min(minmax, minimaxStep(st,depth-1));
+                minmax = Math.min(minmax, minimaxStep(st,depth-1));
             }
         }
         return minmax;

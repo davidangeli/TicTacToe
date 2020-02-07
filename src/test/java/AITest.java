@@ -1,36 +1,30 @@
 import org.junit.jupiter.api.Test;
 import tictactoe.AI;
 import tictactoe.Player;
-import tictactoe.State;
+import tictactoe.TicTacToeState;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AITest {
-    private static final int SIZE = 10;
     private static final int AIDEPTH = 3;
 
     @Test
     public void testAI() throws Exception {
-        State mygame = new State(SIZE, Player.HUMAN);
-        int [] step;
+        TicTacToeState mygame = new TicTacToeState(Player.HUMAN);
+        int size = mygame.getTable().length;
 
-        //1
-        mygame.makeStep(SIZE/2,SIZE/2);
-        step = AI.getNextStep(mygame, AIDEPTH);
-        mygame.makeStep(step[0],step[1]);
+        //1 imitate human step, then an ai step
+        mygame.makeStep(new TicTacToeState.Step(size/2,size/2));
+        mygame.makeStep(AI.getNextStep(mygame, AIDEPTH));
 
         //2-3-4-5
         for (int i = 0; i < 5; i++) {
-            //imitate human step
-            step = mygame.getNextPossibleStates().get(0).getSteps().getLast();
-            mygame.makeStep(step[0], step[1]);
-            // make ai step
-            step = AI.getNextStep(mygame, AIDEPTH);
-            mygame.makeStep(step[0], step[1]);
+            mygame.makeStep(mygame.getNextSteps().getLast());
+            mygame.makeStep(AI.getNextStep(mygame, AIDEPTH));
         }
 
-        assertArrayEquals(mygame.getSteps().element(), new int[]{SIZE/2,SIZE/2});
+        assertEquals(mygame.getSteps().element(), new TicTacToeState.Step(size/2,size/2));
         assertEquals(mygame.getSteps().size(), 12);
     }
 
