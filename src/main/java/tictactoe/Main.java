@@ -1,5 +1,7 @@
 package tictactoe;
 
+import tictactoe.games.TicTacToe;
+
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -7,7 +9,7 @@ public class Main {
 
     private static final int AIDEPTH = 3;
     private static final Scanner scanner = new Scanner(System.in);
-    private final static TicTacToeState game = new TicTacToeState(Player.HUMAN);
+    private final static TicTacToe game = new TicTacToe(Player.HUMAN);
 
     public static void main(String[] args) {
 
@@ -34,6 +36,6 @@ public class Main {
         i = scanner.nextInt();
         j = scanner.nextInt();
         scanner.nextLine();
-        game.makeStep(new TicTacToeState.Step(i,j));
+        game.makeStep(new TicTacToe.Step(i,j));
     }
 }

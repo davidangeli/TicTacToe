@@ -1,5 +1,6 @@
-package tictactoe;
+package tictactoe.games;
 
+import tictactoe.Player;
 import java.util.LinkedList;
 import java.util.Optional;
 /**
@@ -15,19 +16,15 @@ public interface GameState<T> {
     int getScore();
 
     /**
-     * A filter to use to thin out not viable next steps. E.g. a corner field on start in a TicTacToe would not be one.
-     * @return True if the Step is a real option.
-     */
-    boolean isAStepViable(T step);
-
-    /**
-     * Returns a collection of all the possible (~viable) next steps from this one.
+     * Returns a collection of all the possible and viable next steps from this one. Based on implementation,
+     * cold be an already filtered list.
      * @return An LinkedList of Steps.
      */
     LinkedList<T> getNextSteps();
 
     /**
-     * Returns a collection of all the possible (~viable) next states from this one.
+     * Returns a collection of all the possible (~viable) next states from this one. Based on implementation,
+     * cold be an already filtered list.
      * @return An LinkedList of States.
      */
     LinkedList<GameState<T>> getNextStates();

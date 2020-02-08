@@ -1,5 +1,7 @@
 package tictactoe;
 
+import tictactoe.games.GameState;
+
 import java.util.LinkedList;
 /**
  * Static collection of functions normally attributed to an "tictactoe.AI".
