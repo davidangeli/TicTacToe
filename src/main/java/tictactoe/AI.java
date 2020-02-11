@@ -1,8 +1,9 @@
 package tictactoe;
 
 import tictactoe.games.GameState;
+import java.util.Comparator;
+import java.util.Optional;
 
-import java.util.LinkedList;
 /**
  * Static collection of functions normally attributed to an "tictactoe.AI".
  */
@@ -18,21 +19,20 @@ public abstract class AI {
      * @throws Exception thrown when a step could not be selected.
      */
     public static <T> T getNextStep (GameState<T> state, int depth) throws Exception {
-        int maxscore = Integer.MIN_VALUE;
-        T step = null;
-
+        /*int maxscore = Integer.MIN_VALUE;
         LinkedList<GameState<T>> stl = state.getNextStates();
         for (GameState<T> st: stl) {
             int minmax = minimaxStep(st, depth);
-            //System.out.println(minmax);
             if (minmax > maxscore) {
                 step = st.getSteps().getLast();
                 maxscore = minmax;
             }
-        }
+        }*/
+        Optional<GameState<T>> nextstate = state.getNextStates().parallelStream()
+                                                    .max(Comparator.comparing(st -> minimaxStep(st, depth)));
 
-        if (step == null) throw new Exception ("No steps selected.");
-        return step;
+        if (nextstate.isEmpty()) throw new Exception ("No steps selected.");
+        return nextstate.get().getSteps().getLast();
     }
 
     /**

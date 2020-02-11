@@ -3,6 +3,8 @@ package tictactoe.games;
 import tictactoe.Player;
 import java.util.LinkedList;
 import java.util.Optional;
+import java.util.function.Consumer;
+
 /**
  * Describes requirements for a 2 player game stategraph node.
  * @param <T> Type of an in-game step's representation.
@@ -50,9 +52,14 @@ public interface GameState<T> {
     LinkedList<T> getSteps();
 
     /**
-     * This method implements a singel step in the game, changing the current GameState. Throws InvalidAttributesException
+     * This method implements a single step in the game, changing the current GameState. Throws InvalidAttributesException
      * if the step has invalid attributes (eg. negative values or out of bound values, etc).
      * @param step The current move.
      */
     void makeStep(T step) throws IllegalArgumentException;
+
+    /**
+     * Gives a java 8 lambda to run from e.g. user interfaces.
+     */
+    Consumer<T> getStepFunction();
 }

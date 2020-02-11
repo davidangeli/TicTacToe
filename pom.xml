@@ -27,23 +27,36 @@
             <version>5.5.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>13</version>
+        </dependency>
     </dependencies>
 
     <build>
     <plugins>
-    <plugin>
-        <!-- Build an executable JAR -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>3.2.0</version>
-        <configuration>
-            <archive>
-                <manifest>
-                    <mainClass>tictactoe.Main</mainClass>
-                </manifest>
-            </archive>
-        </configuration>
-    </plugin>
+        <plugin>
+            <!-- Build an executable JAR -->
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.2.0</version>
+            <configuration>
+                <archive>
+                    <manifest>
+                        <mainClass>tictactoe.Gui</mainClass>
+                    </manifest>
+                </archive>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-maven-plugin</artifactId>
+            <version>0.0.4</version>
+            <configuration>
+                <mainClass>tictactoe.Gui</mainClass>
+            </configuration>
+        </plugin>
     </plugins>
     </build>
 

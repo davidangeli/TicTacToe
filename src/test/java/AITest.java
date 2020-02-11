@@ -11,7 +11,7 @@ public class AITest {
 
     @Test
     public void testAI() throws Exception {
-        TicTacToe mygame = new TicTacToe(Player.HUMAN);
+        TicTacToe mygame = new TicTacToe(10,5,Player.HUMAN);
         int size = mygame.getTable().length;
 
         //1 imitate human step, then an ai step

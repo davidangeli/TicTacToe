@@ -7,35 +7,16 @@ import java.util.Scanner;
 
 public class Main {
 
-    private static final int AIDEPTH = 3;
-    private static final Scanner scanner = new Scanner(System.in);
-    private final static TicTacToe game = new TicTacToe(Player.HUMAN);
+    private final static int SIZE = 10, WINS = 5;
 
     public static void main(String[] args) {
+        System.out.println("winner:");
 
-        while (game.getWinner().isEmpty()) {
-            playerMove();
-            try {
-                game.makeStep(AI.getNextStep(game, AIDEPTH));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        //TicTacToe game = new TicTacToe(SIZE, WINS, Player.HUMAN);
+        //Gui gui = new Gui(game);
+        //Gui.launch(args);
 
-            for (int j = 0; j < game.getTable().length; j++){
-                System.out.println(Arrays.toString(game.getTable()[j]));
-            }
-        }
 
-        System.out.println("winner:" + game.getWinner());
-        scanner.close();
-    }
-
-    public static void playerMove(){
-        int i, j;
-        System.out.println("Enter row, column:");
-        i = scanner.nextInt();
-        j = scanner.nextInt();
-        scanner.nextLine();
-        game.makeStep(new TicTacToe.Step(i,j));
+        //System.out.println("winner:" + game.getWinner());
     }
 }
