@@ -1,16 +1,16 @@
 package tictactoe.games;
 
 import lombok.Data;
+import tictactoe.Game;
 import tictactoe.Player;
 import java.util.LinkedList;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
- * TicTacToeState class implements the tictactoe game, where an in game step represented by an int[].
+ * TicTacToeState class implements the tictactoe game.
  */
 @Data
-public class TicTacToe implements GameState<TicTacToe.Step> {
+public class TicTacToe implements Game<TicTacToe.Step> {
 
     //getNextStates will only consider fields with a proximity to already marked fields
     private final static int VIABILITYDISTANCE = 1;
@@ -63,11 +63,6 @@ public class TicTacToe implements GameState<TicTacToe.Step> {
         calculateScore();
     }
 
-    @Override
-    public Consumer<Step> getStepFunction() {
-        return this::makeStep;
-    }
-
     /**
      * In tictactoe, a step looks ok if there are other not 0 fields nearby already. Nearby: VIABILITYDISTANCE.
      * @param step An in game step.
@@ -111,8 +106,8 @@ public class TicTacToe implements GameState<TicTacToe.Step> {
     }
 
     @Override
-    public LinkedList<GameState<TicTacToe.Step>> getNextStates() {
-        LinkedList<GameState<TicTacToe.Step>> result = new LinkedList<>();
+    public LinkedList<Game<Step>> getNextStates() {
+        LinkedList<Game<Step>> result = new LinkedList<>();
         for (Step step : getNextSteps()){
             try {
                 result.add(new TicTacToe(this, step));
@@ -134,6 +129,9 @@ public class TicTacToe implements GameState<TicTacToe.Step> {
         return steps;
     }
 
+    /**
+     * This nested class represents an in game step, with two integers meaning row and column.
+     */
     public static class Step {
         public final int i, j;
         public Step (int i, int j){
@@ -233,7 +231,7 @@ public class TicTacToe implements GameState<TicTacToe.Step> {
                     count++;
                     count2++;
                 }
-                //end of diagonals
+                //todo: end of diagonals
                 // ?
             }
         }

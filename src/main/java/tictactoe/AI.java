@@ -1,16 +1,12 @@
 package tictactoe;
 
-import tictactoe.games.GameState;
 import java.util.Comparator;
 import java.util.Optional;
 
 /**
- * Static collection of functions normally attributed to an "tictactoe.AI".
+ * Static collection of functions normally attributed to an "AI".
  */
 public abstract class AI {
-
-    private AI (){
-    }
 
     /**
      * Selects next step for the computer based on a minimax algorithm. If selection fails, throws Exception.
@@ -18,7 +14,7 @@ public abstract class AI {
      * @return Selected step.
      * @throws Exception thrown when a step could not be selected.
      */
-    public static <T> T getNextStep (GameState<T> state, int depth) throws Exception {
+    public static <T> T getNextStep (Game<T> state, int depth) throws Exception {
         /*int maxscore = Integer.MIN_VALUE;
         LinkedList<GameState<T>> stl = state.getNextStates();
         for (GameState<T> st: stl) {
@@ -28,7 +24,7 @@ public abstract class AI {
                 maxscore = minmax;
             }
         }*/
-        Optional<GameState<T>> nextstate = state.getNextStates().parallelStream()
+        Optional<Game<T>> nextstate = state.getNextStates().parallelStream()
                                                     .max(Comparator.comparing(st -> minimaxStep(st, depth)));
 
         if (nextstate.isEmpty()) throw new Exception ("No steps selected.");
@@ -41,13 +37,13 @@ public abstract class AI {
      * @param depth The algorithm goes this deep on the game's state tree.
      * @return A corrected value of the state (and the last step).
      */
-    private static <T> int minimaxStep(GameState<T> state, int depth){
+    private static <T> int minimaxStep(Game<T> state, int depth){
 
         if (depth == 0) return state.getScore();
 
         int minmax = (state.getWhosTurn() == Player.COMPUTER) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
-        for (GameState<T> st : state.getNextStates()) {
+        for (Game<T> st : state.getNextStates()) {
             if (state.getWhosTurn() == Player.COMPUTER) {
                 minmax = Math.max (minmax, minimaxStep(st,depth-1));
             }

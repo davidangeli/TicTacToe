@@ -1,15 +1,13 @@
-package tictactoe.games;
+package tictactoe;
 
-import tictactoe.Player;
 import java.util.LinkedList;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 /**
  * Describes requirements for a 2 player game stategraph node.
  * @param <T> Type of an in-game step's representation.
  */
-public interface GameState<T> {
+public interface Game<T> {
 
     /**
      * Returns the value of the current game state.
@@ -29,7 +27,7 @@ public interface GameState<T> {
      * cold be an already filtered list.
      * @return An LinkedList of States.
      */
-    LinkedList<GameState<T>> getNextStates();
+    LinkedList<Game<T>> getNextStates();
 
     // use of Optional might be reviewed later
 
@@ -57,9 +55,4 @@ public interface GameState<T> {
      * @param step The current move.
      */
     void makeStep(T step) throws IllegalArgumentException;
-
-    /**
-     * Gives a java 8 lambda to run from e.g. user interfaces.
-     */
-    Consumer<T> getStepFunction();
 }
