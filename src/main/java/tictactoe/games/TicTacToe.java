@@ -94,6 +94,8 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     @Override
     public LinkedList<TicTacToe.Step> getNextSteps(){
         LinkedList<TicTacToe.Step> result = new LinkedList<>();
+        if (winner != null) return result;
+
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (table[i][j] == 0){
@@ -173,65 +175,61 @@ public class TicTacToe implements Game<TicTacToe.Step> {
         //for simplicity, we grind through series of 0-s also.
         int[][] results = new int[3][size+1];
 
-        //check rows and columns, starting from index in inner loops 1
-        for (int i = 0; i < size; i++){
-            int countr = 1, countc = 1;
-            int beforer = -1, beforec = -1;
-            for (int j = 1; j < size; j++){
-
-                //end of a series in rows
-                if (table[i][j] != table[i][j-1]) {
-                    results[table[i][j-1]][countr] += seriesValue(beforer, table[i][j-1], table[i][j], countr);
-                    countr = 0;
-                    beforer = table[i][j-1];
-                }
-                //end of a series in columns
-                if (table[j][i] != table[j - 1][i]) {
-                    results[table[j - 1][i]][countc] += seriesValue(beforec, table[j - 1][i], table[j][i], countc);
-                    countc = 0;
-                    beforec = table[j - 1][i];
-                }
-
-                countr++;
-                countc++;
-            }
-            //end of a row and column
-            results[table[i][size-1]][countr] += seriesValue(beforer, table[i][size-1], -1, countr);
-            results[table[size-1][i]][countc] += seriesValue(beforec, table[size-1][i], -1, countc);
-        }
-
-        //check diagonally, starting from index 0 in the inner loop
         for (int n = 1-size; n < size; n++) {
-            int countd1 = 0, countd2 = 0;
-            int before = -1, before2 = -1;
+            int countd1 = 0, countd2 = 0, countr = 1, countc = 1;
+            int befored1 = -1, befored2 = -1, beforer = -1, beforec = -1;
             for (int i = 0; i <= size; i++) {
                 int j = i-n;
                 int j2 = size-j-1;
-                //j==size or i==size option means out of bound index, but enables checking on series ending at boundaries
+
+                //rows and columns checking from n=1
+                if (n>0 && i>0 && i<size){
+                    //end of a series in rows
+                    if (table[n][i] != table[n][i-1]) {
+                        results[table[n][i-1]][countr] += seriesValue(beforer, table[n][i-1], table[n][i], countr);
+                        countr = 0;
+                        beforer = table[n][i-1];
+                    }
+                    //end of a series in columns
+                    if (table[i][n] != table[i-1][n]) {
+                        results[table[i-1][n]][countc] += seriesValue(beforec, table[i-1][n], table[i][n], countc);
+                        countc = 0;
+                        beforec = table[i-1][n];
+                    }
+                    countr++;
+                    countc++;
+                }
+                //end of rows and columns
+                else if (n>0) {
+                    results[table[n][size-1]][countr] += seriesValue(beforer, table[n][size-1], -1, countr);
+                    results[table[size-1][n]][countc] += seriesValue(beforec, table[size-1][n], -1, countc);
+                }
+
+                // diagonals check, valid indexes
                 if ((j >= 0) && (j <= size)){
 
-                    //end of diagonals
+                    // j==size or i==size option means out of bound index, but enables checking on series ending at boundaries
                     if (i== size || j==size){
-                        results[table[i-1][j-1]][countd1] += seriesValue(before, table[i-1][j-1], -1, countd1);
-                        results[table[i-1][j2+1]][countd2] += seriesValue(before2, table[i-1][j2+1], -1, countd2);
+                        results[table[i-1][j-1]][countd1] += seriesValue(befored1, table[i-1][j-1], -1, countd1);
+                        results[table[i-1][j2+1]][countd2] += seriesValue(befored2, table[i-1][j2+1], -1, countd2);
                     }
                     //start of a diagonal
-                    else if (before == -1) {
-                        before = table[i][j];
-                        before2 = table[i][j2];
+                    else if (befored1 == -1) {
+                        befored1 = table[i][j];
+                        befored2 = table[i][j2];
                     }
                     else {
                         //end of a series in d1
                         if (table[i][j] != table[i-1][j-1]) {
-                            results[table[i-1][j-1]][countd1] += seriesValue(before, table[i-1][j-1], table[i][j], countd1);
+                            results[table[i-1][j-1]][countd1] += seriesValue(befored1, table[i-1][j-1], table[i][j], countd1);
                             countd1 = 0;
-                            before = table[i-1][j-1];
+                            befored1 = table[i-1][j-1];
                         }
                         //end of a series in d2
                         if (table[i][j2] != table[i-1][j2+1]) {
-                            results[table[i-1][j2+1]][countd2] += seriesValue(before2, table[i-1][j2+1], table[i][j2], countd2);
+                            results[table[i-1][j2+1]][countd2] += seriesValue(befored2, table[i-1][j2+1], table[i][j2], countd2);
                             countd2 = 0;
-                            before2 = table[i-1][j2+1];
+                            befored2 = table[i-1][j2+1];
                         }
                     }
                     countd1++;

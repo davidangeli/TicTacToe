@@ -9,7 +9,7 @@ import tictactoe.games.TicTacToe;
 import tictactoe.games.TicTacToePlane;
 
 public class Main extends Application {
-    public static final int AIDEPTH = 3;
+    public static final int AIDEPTH = 2;
     private final static int SIZE = 10, WINS = 5;
 
     public static void main(String[] args) {
