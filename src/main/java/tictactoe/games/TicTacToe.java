@@ -176,7 +176,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
         //check rows and columns, starting from index in inner loops 1
         for (int i = 0; i < size; i++){
             int countr = 1, countc = 1;
-            int beforer = table[i][0], beforec = table[0][i];
+            int beforer = -1, beforec = -1;
             for (int j = 1; j < size; j++){
 
                 //end of a series in rows
@@ -185,14 +185,14 @@ public class TicTacToe implements Game<TicTacToe.Step> {
                     countr = 0;
                     beforer = table[i][j-1];
                 }
-                countr++;
-
                 //end of a series in columns
                 if (table[j][i] != table[j - 1][i]) {
                     results[table[j - 1][i]][countc] += seriesValue(beforec, table[j - 1][i], table[j][i], countc);
                     countc = 0;
                     beforec = table[j - 1][i];
                 }
+
+                countr++;
                 countc++;
             }
             //end of a row and column
@@ -200,20 +200,20 @@ public class TicTacToe implements Game<TicTacToe.Step> {
             results[table[size-1][i]][countc] += seriesValue(beforec, table[size-1][i], -1, countc);
         }
 
-        //check diagonally, starting from index 0 in both loops
+        //check diagonally, starting from index 0 in the inner loop
         for (int n = 1-size; n < size; n++) {
-            int count = 0, count2 = 0;
+            int countd1 = 0, countd2 = 0;
             int before = -1, before2 = -1;
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i <= size; i++) {
                 int j = i-n;
                 int j2 = size-j-1;
-                //j==size option means out of bound index, but enables checking on series ending at boundaries
+                //j==size or i==size option means out of bound index, but enables checking on series ending at boundaries
                 if ((j >= 0) && (j <= size)){
 
                     //end of diagonals
-                    if (j==size){
-                        results[table[i-1][j-1]][count] += seriesValue(before, table[i-1][j-1], -1, count);
-                        results[table[i-1][j2+1]][count2] += seriesValue(before2, table[i-1][j2+1], -1, count2);
+                    if (i== size || j==size){
+                        results[table[i-1][j-1]][countd1] += seriesValue(before, table[i-1][j-1], -1, countd1);
+                        results[table[i-1][j2+1]][countd2] += seriesValue(before2, table[i-1][j2+1], -1, countd2);
                     }
                     //start of a diagonal
                     else if (before == -1) {
@@ -223,19 +223,19 @@ public class TicTacToe implements Game<TicTacToe.Step> {
                     else {
                         //end of a series in d1
                         if (table[i][j] != table[i-1][j-1]) {
-                            results[table[i-1][j-1]][count] += seriesValue(before, table[i-1][j-1], table[i][j], count);
-                            count = 0;
+                            results[table[i-1][j-1]][countd1] += seriesValue(before, table[i-1][j-1], table[i][j], countd1);
+                            countd1 = 0;
                             before = table[i-1][j-1];
                         }
                         //end of a series in d2
                         if (table[i][j2] != table[i-1][j2+1]) {
-                            results[table[i-1][j2+1]][count2] += seriesValue(before2, table[i-1][j2+1], table[i][j2], count2);
-                            count2 = 0;
+                            results[table[i-1][j2+1]][countd2] += seriesValue(before2, table[i-1][j2+1], table[i][j2], countd2);
+                            countd2 = 0;
                             before2 = table[i-1][j2+1];
                         }
                     }
-                    count++;
-                    count2++;
+                    countd1++;
+                    countd2++;
                 }
             }
 
@@ -245,7 +245,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
 
     /**
      * Gives a value to a series of marks based on length and openness, making a difference between fully open and partly closed ones.
-     * @param before Value of field before the sart of this series.
+     * @param before Value of field before the start of this series.
      * @param current Value of fields in this series.
      * @return integer value of 0, 1 or 2.
      */
