@@ -201,16 +201,22 @@ public class TicTacToe implements Game<TicTacToe.Step> {
         }
 
         //check diagonally, starting from index 0 in both loops
-        for (int n = -size; n <= size; n++) {
+        for (int n = 1-size; n < size; n++) {
             int count = 0, count2 = 0;
             int before = -1, before2 = -1;
-            for (int i = 0; i < size; i++){
+            for (int i = 0; i < size; i++) {
                 int j = i-n;
                 int j2 = size-j-1;
-                if ((j >= 0) && (j < size)){
+                //j==size option means out of bound index, but enables checking on series ending at boundaries
+                if ((j >= 0) && (j <= size)){
 
+                    //end of diagonals
+                    if (j==size){
+                        results[table[i-1][j-1]][count] += seriesValue(before, table[i-1][j-1], -1, count);
+                        results[table[i-1][j2+1]][count2] += seriesValue(before2, table[i-1][j2+1], -1, count2);
+                    }
                     //start of a diagonal
-                    if (before == -1) {
+                    else if (before == -1) {
                         before = table[i][j];
                         before2 = table[i][j2];
                     }
@@ -231,9 +237,8 @@ public class TicTacToe implements Game<TicTacToe.Step> {
                     count++;
                     count2++;
                 }
-                //todo: end of diagonals
-                // ?
             }
+
         }
         return results;
     }

@@ -17,14 +17,14 @@ public interface Game<T> {
 
     /**
      * Returns a collection of all the possible and viable next steps from this one. Based on implementation,
-     * cold be an already filtered list.
+     * could be an already filtered list.
      * @return An LinkedList of Steps.
      */
     LinkedList<T> getNextSteps();
 
     /**
      * Returns a collection of all the possible (~viable) next states from this one. Based on implementation,
-     * cold be an already filtered list.
+     * could be an already filtered list.
      * @return An LinkedList of States.
      */
     LinkedList<Game<T>> getNextStates();
