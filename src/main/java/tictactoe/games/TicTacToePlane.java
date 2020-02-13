@@ -8,7 +8,12 @@ import javafx.scene.layout.GridPane;
 import lombok.EqualsAndHashCode;
 import tictactoe.AI;
 import tictactoe.Main;
+import tictactoe.Player;
 
+/**
+ * Graphical interface for the TaicTactoe Game. Extends javafx's GridPane.
+ * Represents the game's table as a grid of buttons.
+ */
 public class TicTacToePlane extends GridPane {
     final TicTacToe game;
     final Label whosturn;
@@ -27,6 +32,9 @@ public class TicTacToePlane extends GridPane {
         }
     }
 
+    /**
+     * This subclass of javafx's Button contains a preindexed TicTacToeGame.Step.
+     */
     @EqualsAndHashCode(callSuper = true)
     class TicTacToeButton extends Button {
         TicTacToe.Step step;
@@ -46,7 +54,7 @@ public class TicTacToePlane extends GridPane {
                 game.makeStep(step);
                 this.setText("X");
                 if (game.getWinner().isPresent()) {
-                    whosturn.setText("WINNER: " + game.getWinner().toString());
+                    whosturn.setText("WINNER: " + game.getWinner().get().toString());
                     return;
                 }
                 whosturn.setText("COMPUTER");
@@ -55,7 +63,7 @@ public class TicTacToePlane extends GridPane {
                 game.makeStep(step2);
                 buttons[step2.i][step2.j].setText("O");
                 if (game.getWinner().isPresent()) {
-                    whosturn.setText("WINNER: " + game.getWinner().toString());
+                    whosturn.setText("WINNER: " + game.getWinner().get().toString());
                     return;
                 }
                 whosturn.setText("PLAYER");

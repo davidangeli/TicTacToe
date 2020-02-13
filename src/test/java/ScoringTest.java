@@ -2,6 +2,8 @@ import tictactoe.Player;
 import org.junit.jupiter.api.Test;
 import tictactoe.games.TicTacToe;
 
+import java.util.Arrays;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ScoringTest {
@@ -21,8 +23,14 @@ public class ScoringTest {
         mygame.makeStep(new TicTacToe.Step(4,4));
         mygame.makeStep(new TicTacToe.Step(1,2));
 
-        int score = 1*10000-4*1;
+        for (int[] arr : mygame.getTable()) {
+            System.out.println(Arrays.toString(arr));
+        }
+        for (int[] arr : mygame.getSeries()) {
+            System.out.println(Arrays.toString(arr));
+        }
 
+        int score = -4;
         assertEquals(score, mygame.getScore());
     }
 }

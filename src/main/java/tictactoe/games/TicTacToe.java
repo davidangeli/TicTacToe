@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.Optional;
 
 /**
- * TicTacToeState class implements the tictactoe game.
+ * TicTacToe class implements the tictactoe game.
  */
 @Data
 public class TicTacToe implements Game<TicTacToe.Step> {
@@ -19,7 +19,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     private final int[][] table;
     private int[][] series;
     private int score = 0;
-    private LinkedList<TicTacToe.Step> steps = new LinkedList<>();
+    private LinkedList<Step> steps = new LinkedList<>();
     private Player whosTurn;
     private Player winner;
 
@@ -33,10 +33,10 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     /**
      * Constructor from an existing TicTacToeState with making an in-game step. Throws InvalidAttributeException
      * if the step can not be made.
-     * @param other The original game TicTacToeState.
-     * @param step The steps being made, row and column indexes in an array.
+     * @param other The original game TicTacToe.
+     * @param step The steps being made.
      */
-    public TicTacToe(TicTacToe other, TicTacToe.Step step) throws IllegalArgumentException {
+    public TicTacToe(TicTacToe other, Step step) throws IllegalArgumentException {
         if (other.table[step.i][step.j] != 0) throw new IllegalArgumentException("Field is not null.");
 
         this.size = other.size;
@@ -52,7 +52,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     }
 
     @Override
-    public void makeStep(TicTacToe.Step step) throws IllegalArgumentException {
+    public void makeStep(Step step) throws IllegalArgumentException {
         if (step.i<0 || step.j<0 || step.i>=size || step.j>=size || table[step.i][step.j] != 0) {
             throw new IllegalArgumentException("Illegal step indexes");
         }
@@ -68,7 +68,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
      * @param step An in game step.
      * @return True if the step in parameter is a viable option.
      */
-    public boolean isAStepViable(TicTacToe.Step step) {
+    public boolean isAStepViable(Step step) {
         boolean viable = false;
         int minrow = Math.max(0,step.i-VIABILITYDISTANCE);
         int maxrow = Math.min(size,step.i+VIABILITYDISTANCE+1);
@@ -88,12 +88,12 @@ public class TicTacToe implements Game<TicTacToe.Step> {
 
     /**
      * {@inheritDoc}
-     * In tictactoe, this list if filtered by viability.
+     * In tictactoe, this list is filtered by viability.
      * @return
      */
     @Override
-    public LinkedList<TicTacToe.Step> getNextSteps(){
-        LinkedList<TicTacToe.Step> result = new LinkedList<>();
+    public LinkedList<Step> getNextSteps(){
+        LinkedList<Step> result = new LinkedList<>();
         if (winner != null) return result;
 
         for (int i = 0; i < size; i++) {
@@ -149,7 +149,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     }
 
     /**
-     * Calculates score for a given state.
+     * Calculates and sets score for a given state.
      */
     private void calculateScore (){
         //int[][] series = countSeries();
@@ -183,7 +183,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
                 int j2 = size-j-1;
 
                 //rows and columns checking from n=1
-                if (n>0 && i>0 && i<size){
+                if (n > 0 && i > 0 && i < size){
                     //end of a series in rows
                     if (table[n][i] != table[n][i-1]) {
                         results[table[n][i-1]][countr] += seriesValue(beforer, table[n][i-1], table[n][i], countr);
@@ -256,6 +256,5 @@ public class TicTacToe implements Game<TicTacToe.Step> {
         //other closed series do not count for now
         return 0;
     }
-
 
 }
