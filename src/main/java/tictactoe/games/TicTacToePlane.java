@@ -10,13 +10,13 @@ import tictactoe.AI;
 import tictactoe.Main;
 
 /**
- * Graphical interface for the TaicTactoe Game. Extends javafx's GridPane.
+ * Graphical interface for the TicTactoe Game. Extends javafx's GridPane.
  * Represents the game's table as a grid of buttons.
  */
 public class TicTacToePlane extends GridPane {
-    final TicTacToe game;
-    final Label whosturn;
-    final TicTacToeButton[][] buttons;
+    private final TicTacToe game;
+    private final Label whosturn;
+    private final TicTacToeButton[][] buttons;
 
     public TicTacToePlane(TicTacToe game, Label whosturn, int width){
         this.game = game;

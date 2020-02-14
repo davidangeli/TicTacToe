@@ -100,7 +100,7 @@ public class Kamisado implements Game<Kamisado.Step> {
      * @param tower The tower who's possible steps we collect.
      * @return LinkedList<Step>
      */
-    private LinkedList<Step> getNextSteps(Tower tower) {
+    public LinkedList<Step> getNextSteps(Tower tower) {
         LinkedList<Step> result = new LinkedList<>();
 
         // if the color does not match, empty list
