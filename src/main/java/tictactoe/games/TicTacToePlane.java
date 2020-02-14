@@ -8,7 +8,6 @@ import javafx.scene.layout.GridPane;
 import lombok.EqualsAndHashCode;
 import tictactoe.AI;
 import tictactoe.Main;
-import tictactoe.Player;
 
 /**
  * Graphical interface for the TaicTactoe Game. Extends javafx's GridPane.

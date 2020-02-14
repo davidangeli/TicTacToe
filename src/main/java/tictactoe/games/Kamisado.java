@@ -49,7 +49,7 @@ public class Kamisado implements Game<Kamisado.Step> {
      * @param other The original game Kamisado.
      * @param step The steps being made.
      */
-    public Kamisado (Kamisado other, Step step) {
+    private Kamisado (Kamisado other, Step step) {
         if (other.table[step.i][step.j] != null) throw new IllegalArgumentException("Field is not null.");
 
         whosTurn = other.whosTurn;

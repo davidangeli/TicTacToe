@@ -36,7 +36,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
      * @param other The original game TicTacToe.
      * @param step The steps being made.
      */
-    public TicTacToe(TicTacToe other, Step step) throws IllegalArgumentException {
+    private TicTacToe(TicTacToe other, Step step) throws IllegalArgumentException {
         if (other.table[step.i][step.j] != 0) throw new IllegalArgumentException("Field is not null.");
 
         this.size = other.size;
