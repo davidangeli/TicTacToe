@@ -49,8 +49,8 @@ public class Kamisado implements Game<Kamisado.Step> {
      * @param other The original game Kamisado.
      * @param step The steps being made.
      */
-    private Kamisado (Kamisado other, Optional<Step> step) {
-        if (step.isPresent() && other.table[step.get().i][step.get().j] != null) {
+    private Kamisado (Kamisado other, Step step) {
+        if (other.table[step.i][step.j] != null) {
             throw new IllegalArgumentException("Field is not null.");
         }
 
@@ -66,23 +66,25 @@ public class Kamisado implements Game<Kamisado.Step> {
     }
 
     @Override
-    public void makeStep(Optional<Step> step) throws IllegalArgumentException {
-        if (step.isPresent()) {
-            Step stepv = step.get();
-
-            if (stepv.i < 0 || stepv.j < 0 || stepv.i >= 8 || stepv.j >= 8 || table[stepv.i][stepv.j] != null) {
-                throw new IllegalArgumentException("Illegal step indexes");
-            }
-
-            int i = stepv.tower.getI(), j = stepv.tower.getJ();
-            table[i][j] = null;
-            table[stepv.i][stepv.j] = stepv.tower;
-            stepv.tower.setI(stepv.i);
-            stepv.tower.setJ(stepv.j);
+    public void makeStep(Step step) throws IllegalArgumentException {
+        if (step.i < 0 || step.j < 0 || step.i >= 8 || step.j >= 8 || table[step.i][step.j] != null) {
+            throw new IllegalArgumentException("Illegal step indexes");
         }
-        steps.add(step);
+
+        int i = step.tower.getI(), j = step.tower.getJ();
+        table[i][j] = null;
+        table[step.i][step.j] = step.tower;
+        step.tower.setI(step.i);
+        step.tower.setJ(step.j);
+        steps.add(Optional.of(step));
         whosTurn = whosTurn.next();
         calculateScore();
+    }
+
+    @Override
+    public void skipStep() {
+        steps.add(Optional.empty());
+        whosTurn = whosTurn.next();
     }
 
     /**
@@ -145,7 +147,7 @@ public class Kamisado implements Game<Kamisado.Step> {
         LinkedList<Game<Step>> result = new LinkedList<>();
         for (Step step : getNextSteps()){
             try {
-                result.add(new Kamisado(this, Optional.of(step)));
+                result.add(new Kamisado(this, step));
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }

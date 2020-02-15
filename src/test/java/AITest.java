@@ -3,8 +3,6 @@ import tictactoe.AI;
 import tictactoe.Player;
 import tictactoe.games.TicTacToe;
 
-import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AITest {
@@ -16,13 +14,13 @@ public class AITest {
         int size = mygame.getTable().length;
 
         //1 imitate human step, then an ai step
-        mygame.makeStep(Optional.of(new TicTacToe.Step(size/2,size/2)));
-        mygame.makeStep(AI.getNextStep(mygame, AIDEPTH));
+        mygame.makeStep(new TicTacToe.Step(size/2,size/2));
+        mygame.makeStep(AI.getNextStep(mygame, AIDEPTH).get());
 
         //2-3-4-5
         for (int i = 0; i < 5; i++) {
-            mygame.makeStep(Optional.of(mygame.getNextSteps().getLast()));
-            mygame.makeStep(AI.getNextStep(mygame, AIDEPTH));
+            mygame.makeStep(mygame.getNextSteps().getLast());
+            mygame.makeStep(AI.getNextStep(mygame, AIDEPTH).get());
         }
 
         assertEquals(mygame.getSteps().element().get(), new TicTacToe.Step(size/2,size/2));

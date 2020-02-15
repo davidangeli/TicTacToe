@@ -8,7 +8,7 @@ import javafx.scene.layout.GridPane;
 import lombok.EqualsAndHashCode;
 import tictactoe.AI;
 import tictactoe.Main;
-
+import tictactoe.Player;
 import java.util.Optional;
 
 /**
@@ -34,6 +34,20 @@ public class TicTacToePlane extends GridPane {
     }
 
     /**
+     * making a step on the game's board representation.
+     * @param step An in-game Step object.
+     */
+    private void makePlaneStep(TicTacToe.Step step){
+        String mark = game.getWhosTurn() == Player.COMPUTER ? "O" : "X";
+        game.makeStep(step);
+        buttons[step.i][step.j].setText(mark);
+        game.getWinner().ifPresentOrElse(
+                winner -> whosturn.setText(winner.toString()),
+                () -> whosturn.setText(game.getWhosTurn().toString())
+        );
+    }
+
+    /**
      * This subclass of javafx's Button contains a preindexed TicTacToeGame.Step.
      */
     @EqualsAndHashCode(callSuper = true)
@@ -52,22 +66,11 @@ public class TicTacToePlane extends GridPane {
 
             try {
                 //Player' move
-                game.makeStep(Optional.of(step));
-                this.setText("X");
-                if (game.getWinner().isPresent()) {
-                    whosturn.setText("WINNER: " + game.getWinner().get().toString());
-                    return;
-                }
-                whosturn.setText("COMPUTER");
-                //computer's move - no step option is not really possible
+                makePlaneStep(step);
+                if (game.getWinner().isPresent()) return;
+                //Computer's move - no step option is not really possible in TicTacToe
                 Optional<TicTacToe.Step> step2 = AI.getNextStep(game, Main.AIDEPTH);
-                game.makeStep(step2);
-                buttons[step2.get().i][step2.get().j].setText("O");
-                if (game.getWinner().isPresent()) {
-                    whosturn.setText("WINNER: " + game.getWinner().get().toString());
-                    return;
-                }
-                whosturn.setText("PLAYER");
+                step2.ifPresent(s -> makePlaneStep(step));
             } catch (Exception e){
                 e.printStackTrace();
             }

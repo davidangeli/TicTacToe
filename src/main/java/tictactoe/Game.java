@@ -57,5 +57,10 @@ public interface Game<T> {
      * (eg. negative values or out of bound values, etc).
      * @param step The current move.
      */
-    void makeStep(Optional<T> step) throws IllegalArgumentException;
+    void makeStep(T step) throws IllegalArgumentException;
+
+    /**
+     * This method should be called when a Player can not move, and so passes.
+     */
+    void skipStep();
 }

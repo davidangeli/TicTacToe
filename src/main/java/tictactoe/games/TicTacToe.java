@@ -36,10 +36,8 @@ public class TicTacToe implements Game<TicTacToe.Step> {
      * @param other The original game TicTacToe.
      * @param step The steps being made.
      */
-    private TicTacToe(TicTacToe other, Optional<Step> step) throws IllegalArgumentException {
-        //In TicTacToe there should be no skipped moves.
-        Step stepv = step.get();
-        if (other.table[stepv.i][stepv.j] != 0) throw new IllegalArgumentException("Field is not null.");
+    private TicTacToe(TicTacToe other, Step step) throws IllegalArgumentException {
+        if (other.table[step.i][step.j] != 0) throw new IllegalArgumentException("Field is not null.");
 
         this.size = other.size;
         this.wins = other.wins;
@@ -54,17 +52,20 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     }
 
     @Override
-    public void makeStep(Optional<Step> step) throws IllegalArgumentException {
-        //In TicTacToe there should be no skipped moves.
-        Step stepv = step.get();
-        if (stepv.i<0 || stepv.j<0 || stepv.i>=size || stepv.j>=size || table[stepv.i][stepv.j] != 0) {
+    public void makeStep(Step step) throws IllegalArgumentException {
+        if (step.i<0 || step.j<0 || step.i>=size || step.j>=size || table[step.i][step.j] != 0) {
             throw new IllegalArgumentException("Illegal step indexes.");
         }
 
-        table[stepv.i][stepv.j] = whosTurn.ordinal()+1;
-        steps.add(step);
+        table[step.i][step.j] = whosTurn.ordinal()+1;
+        steps.add(Optional.of(step));
         whosTurn = whosTurn.next();
         calculateScore();
+    }
+
+    @Override
+    public void skipStep() {
+        // not implemented in TicTactoe;
     }
 
     /**
@@ -116,7 +117,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
         LinkedList<Game<Step>> result = new LinkedList<>();
         for (Step step : getNextSteps()){
             try {
-                result.add(new TicTacToe(this, Optional.of(step)));
+                result.add(new TicTacToe(this, step));
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }

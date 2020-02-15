@@ -8,7 +8,6 @@ import lombok.EqualsAndHashCode;
 import tictactoe.AI;
 import tictactoe.Main;
 import tictactoe.Player;
-
 import java.util.Optional;
 
 /**
@@ -83,7 +82,7 @@ public class KamisadoPlane {
                     //Player' move
                     Kamisado.Step newStep = new Kamisado.Step(activeTower, this.step.i, this.step.j);
                     moveTower(newStep);
-                    game.makeStep(Optional.of(newStep));
+                    game.makeStep(newStep);
                     if (game.getWinner().isPresent()) {
                         whosturn.setText("WINNER: " + game.getWinner().get().toString());
                         return;
@@ -91,8 +90,10 @@ public class KamisadoPlane {
                     whosturn.setText("COMPUTER");
                     //computer's move
                     Optional<Kamisado.Step> aiStep = AI.getNextStep(game, Main.AIDEPTH);
-                    aiStep.ifPresent(KamisadoPlane.this::moveTower);
-                    game.makeStep(aiStep);
+                    aiStep.ifPresentOrElse(s -> {
+                        moveTower(s);
+                        game.makeStep(s);
+                    }, game::skipStep);
                     if (game.getWinner().isPresent()) {
                         whosturn.setText("WINNER: " + game.getWinner().get().toString());
                         return;
