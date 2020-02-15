@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import tictactoe.AI;
 import tictactoe.Main;
 
+import java.util.Optional;
+
 /**
  * Graphical interface for the TicTactoe Game. Extends javafx's GridPane.
  * Represents the game's table as a grid of buttons.
@@ -50,17 +52,17 @@ public class TicTacToePlane extends GridPane {
 
             try {
                 //Player' move
-                game.makeStep(step);
+                game.makeStep(Optional.of(step));
                 this.setText("X");
                 if (game.getWinner().isPresent()) {
                     whosturn.setText("WINNER: " + game.getWinner().get().toString());
                     return;
                 }
                 whosturn.setText("COMPUTER");
-                //computer's move
-                TicTacToe.Step step2 = AI.getNextStep(game, Main.AIDEPTH);
+                //computer's move - no step option is not really possible
+                Optional<TicTacToe.Step> step2 = AI.getNextStep(game, Main.AIDEPTH);
                 game.makeStep(step2);
-                buttons[step2.i][step2.j].setText("O");
+                buttons[step2.get().i][step2.get().j].setText("O");
                 if (game.getWinner().isPresent()) {
                     whosturn.setText("WINNER: " + game.getWinner().get().toString());
                     return;

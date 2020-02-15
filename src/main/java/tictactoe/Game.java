@@ -3,6 +3,8 @@ package tictactoe;
 import java.util.LinkedList;
 import java.util.Optional;
 
+//TODO: rethink usage of optional in parameters.
+
 /**
  * Describes requirements for a 2 player game stategraph node.
  * @param <T> Type of an in-game step's representation.
@@ -44,15 +46,16 @@ public interface Game<T> {
     Player getWhosTurn();
 
     /**
-     * Gets the list of all steps made in the game so far.
+     * Gets the list of all steps made in the game so far. Optional.empty means skipped move.
      * @return A Linked list of Step objects.
      */
-    LinkedList<T> getSteps();
+    LinkedList<Optional<T>> getSteps();
 
     /**
-     * This method implements a single step in the game, changing the current GameState. Throws InvalidAttributesException
-     * if the step has invalid attributes (eg. negative values or out of bound values, etc).
+     * This method implements a single step in the game, changing the current GameState. Optional.empty means skip.
+     * Throws InvalidAttributesException if the step has invalid attributes
+     * (eg. negative values or out of bound values, etc).
      * @param step The current move.
      */
-    void makeStep(T step) throws IllegalArgumentException;
+    void makeStep(Optional<T> step) throws IllegalArgumentException;
 }

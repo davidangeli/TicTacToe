@@ -19,7 +19,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     private final int[][] table;
     private int[][] series;
     private int score = 0;
-    private LinkedList<Step> steps = new LinkedList<>();
+    private LinkedList<Optional<Step>> steps = new LinkedList<>();
     private Player whosTurn;
     private Player winner;
 
@@ -36,8 +36,10 @@ public class TicTacToe implements Game<TicTacToe.Step> {
      * @param other The original game TicTacToe.
      * @param step The steps being made.
      */
-    private TicTacToe(TicTacToe other, Step step) throws IllegalArgumentException {
-        if (other.table[step.i][step.j] != 0) throw new IllegalArgumentException("Field is not null.");
+    private TicTacToe(TicTacToe other, Optional<Step> step) throws IllegalArgumentException {
+        //In TicTacToe there should be no skipped moves.
+        Step stepv = step.get();
+        if (other.table[stepv.i][stepv.j] != 0) throw new IllegalArgumentException("Field is not null.");
 
         this.size = other.size;
         this.wins = other.wins;
@@ -52,12 +54,14 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     }
 
     @Override
-    public void makeStep(Step step) throws IllegalArgumentException {
-        if (step.i<0 || step.j<0 || step.i>=size || step.j>=size || table[step.i][step.j] != 0) {
-            throw new IllegalArgumentException("Illegal step indexes");
+    public void makeStep(Optional<Step> step) throws IllegalArgumentException {
+        //In TicTacToe there should be no skipped moves.
+        Step stepv = step.get();
+        if (stepv.i<0 || stepv.j<0 || stepv.i>=size || stepv.j>=size || table[stepv.i][stepv.j] != 0) {
+            throw new IllegalArgumentException("Illegal step indexes.");
         }
 
-        table[step.i][step.j] = whosTurn.ordinal()+1;
+        table[stepv.i][stepv.j] = whosTurn.ordinal()+1;
         steps.add(step);
         whosTurn = whosTurn.next();
         calculateScore();
@@ -112,7 +116,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
         LinkedList<Game<Step>> result = new LinkedList<>();
         for (Step step : getNextSteps()){
             try {
-                result.add(new TicTacToe(this, step));
+                result.add(new TicTacToe(this, Optional.of(step)));
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }
@@ -124,11 +128,6 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     public Optional<Player> getWinner(){
         if (winner == null) return Optional.empty();
         return Optional.of(winner);
-    }
-
-    @Override
-    public LinkedList<Step> getSteps(){
-        return steps;
     }
 
     /**

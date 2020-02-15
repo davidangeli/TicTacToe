@@ -9,6 +9,8 @@ import tictactoe.AI;
 import tictactoe.Main;
 import tictactoe.Player;
 
+import java.util.Optional;
+
 /**
  * Graphical interface for the Kamisado Game. Extends javafx's GridPane.
  * Represents the game's table as a grid of buttons.
@@ -81,15 +83,15 @@ public class KamisadoPlane {
                     //Player' move
                     Kamisado.Step newStep = new Kamisado.Step(activeTower, this.step.i, this.step.j);
                     moveTower(newStep);
-                    game.makeStep(newStep);
+                    game.makeStep(Optional.of(newStep));
                     if (game.getWinner().isPresent()) {
                         whosturn.setText("WINNER: " + game.getWinner().get().toString());
                         return;
                     }
                     whosturn.setText("COMPUTER");
                     //computer's move
-                    Kamisado.Step aiStep = AI.getNextStep(game, Main.AIDEPTH);
-                    moveTower(aiStep);
+                    Optional<Kamisado.Step> aiStep = AI.getNextStep(game, Main.AIDEPTH);
+                    aiStep.ifPresent(KamisadoPlane.this::moveTower);
                     game.makeStep(aiStep);
                     if (game.getWinner().isPresent()) {
                         whosturn.setText("WINNER: " + game.getWinner().get().toString());

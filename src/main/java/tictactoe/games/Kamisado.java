@@ -24,7 +24,7 @@ public class Kamisado implements Game<Kamisado.Step> {
     };
     private final Tower[][] table = new Tower[8][8];
     private int score = 0;
-    private LinkedList<Step> steps = new LinkedList<>();
+    private LinkedList<Optional<Step>> steps = new LinkedList<>();
     private final Tower[][] playerTowers = new Tower[2][8];
     private Player whosTurn;
     private Player winner;
@@ -49,8 +49,10 @@ public class Kamisado implements Game<Kamisado.Step> {
      * @param other The original game Kamisado.
      * @param step The steps being made.
      */
-    private Kamisado (Kamisado other, Step step) {
-        if (other.table[step.i][step.j] != null) throw new IllegalArgumentException("Field is not null.");
+    private Kamisado (Kamisado other, Optional<Step> step) {
+        if (step.isPresent() && other.table[step.get().i][step.get().j] != null) {
+            throw new IllegalArgumentException("Field is not null.");
+        }
 
         whosTurn = other.whosTurn;
         for (int i=0; i < 8; i++){
@@ -64,16 +66,20 @@ public class Kamisado implements Game<Kamisado.Step> {
     }
 
     @Override
-    public void makeStep(Step step) throws IllegalArgumentException {
-        if (step.i<0 || step.j<0 || step.i>=8 || step.j>=8 || table[step.i][step.j] != null) {
-            throw new IllegalArgumentException("Illegal step indexes");
-        }
+    public void makeStep(Optional<Step> step) throws IllegalArgumentException {
+        if (step.isPresent()) {
+            Step stepv = step.get();
 
-        int i = step.tower.getI(), j = step.tower.getJ();
-        table[i][j] = null;
-        table[step.i][step.j] = step.tower;
-        step.tower.setI(step.i);
-        step.tower.setJ(step.j);
+            if (stepv.i < 0 || stepv.j < 0 || stepv.i >= 8 || stepv.j >= 8 || table[stepv.i][stepv.j] != null) {
+                throw new IllegalArgumentException("Illegal step indexes");
+            }
+
+            int i = stepv.tower.getI(), j = stepv.tower.getJ();
+            table[i][j] = null;
+            table[stepv.i][stepv.j] = stepv.tower;
+            stepv.tower.setI(stepv.i);
+            stepv.tower.setJ(stepv.j);
+        }
         steps.add(step);
         whosTurn = whosTurn.next();
         calculateScore();
@@ -104,7 +110,7 @@ public class Kamisado implements Game<Kamisado.Step> {
         LinkedList<Step> result = new LinkedList<>();
 
         // if the color does not match, empty list
-        if (!steps.isEmpty() && steps.getLast().getColor() != tower.color)
+        if (!steps.isEmpty() && steps.getLast().isPresent() && steps.getLast().get().getColor() != tower.color)
         return result;
 
         // else
@@ -139,7 +145,7 @@ public class Kamisado implements Game<Kamisado.Step> {
         LinkedList<Game<Step>> result = new LinkedList<>();
         for (Step step : getNextSteps()){
             try {
-                result.add(new Kamisado(this, step));
+                result.add(new Kamisado(this, Optional.of(step)));
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }
@@ -186,7 +192,7 @@ public class Kamisado implements Game<Kamisado.Step> {
      * This class represents a tower in game, with two integers meaning row and column.
      */
     @Data
-    class Tower {
+    static class Tower {
         public final Color color;
         private int i, j;
         Tower (Color color, int i, int j) {

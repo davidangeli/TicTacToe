@@ -11,10 +11,9 @@ public abstract class AI {
     /**
      * Selects next step for the computer based on a minimax algorithm. If selection fails, throws Exception.
      * @param state The actual game state on which the computer gets the next step.
-     * @return Selected step.
-     * @throws Exception thrown when a step could not be selected.
+     * @return Selected step. Empty if can not move.
      */
-    public static <T> T getNextStep (Game<T> state, int depth) throws Exception {
+    public static <T> Optional<T> getNextStep (Game<T> state, int depth) {
         /*int maxscore = Integer.MIN_VALUE;
         LinkedList<GameState<T>> stl = state.getNextStates();
         for (GameState<T> st: stl) {
@@ -27,7 +26,7 @@ public abstract class AI {
         Optional<Game<T>> nextstate = state.getNextStates().parallelStream()
                                                     .max(Comparator.comparing(st -> minimaxStep(st, depth)));
 
-        if (nextstate.isEmpty()) throw new Exception ("No steps selected.");
+        if (nextstate.isEmpty()) return Optional.empty();
         return nextstate.get().getSteps().getLast();
     }
 
