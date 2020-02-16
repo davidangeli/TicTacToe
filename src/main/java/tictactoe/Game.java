@@ -1,5 +1,6 @@
 package tictactoe;
 
+import javafx.util.Pair;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -49,7 +50,7 @@ public interface Game<T> {
      * Gets the list of all steps made in the game so far. Optional.empty means skipped move.
      * @return A Linked list of Step objects.
      */
-    LinkedList<Optional<T>> getSteps();
+    LinkedList<Pair<Player, Optional<T>>> getSteps();
 
     /**
      * This method implements a single step in the game, changing the current GameState. Optional.empty means skip.

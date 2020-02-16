@@ -27,7 +27,7 @@ public abstract class AI {
                                                     .max(Comparator.comparing(st -> minimaxStep(st, depth)));
 
         if (nextstate.isEmpty()) return Optional.empty();
-        return nextstate.get().getSteps().getLast();
+        return nextstate.get().getSteps().getLast().getValue();
     }
 
     /**

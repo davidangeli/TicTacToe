@@ -23,7 +23,7 @@ public class AITest {
             mygame.makeStep(AI.getNextStep(mygame, AIDEPTH).get());
         }
 
-        assertEquals(mygame.getSteps().element().get(), new TicTacToe.Step(size/2,size/2));
+        assertEquals(mygame.getSteps().element().getValue().get(), new TicTacToe.Step(size/2,size/2));
         assertEquals(mygame.getSteps().size(), 12);
     }
 

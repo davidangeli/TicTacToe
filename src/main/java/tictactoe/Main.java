@@ -6,6 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import tictactoe.games.Kamisado;
+import tictactoe.games.KamisadoPlane;
 import tictactoe.games.TicTacToe;
 import tictactoe.games.TicTacToePlane;
 
@@ -24,7 +26,8 @@ public class Main extends Application {
 
         stage.setTitle("Tic-Tac-Toe");
         Label whosturn = new Label("PLAYER");
-        TicTacToePlane plane = new TicTacToePlane(new TicTacToe (SIZE, WINS, Player.HUMAN), whosturn, 300);
+        //TicTacToePlane plane = new TicTacToePlane(new TicTacToe (SIZE, WINS, Player.HUMAN), whosturn, 300);
+        KamisadoPlane plane = new KamisadoPlane(new Kamisado(Player.HUMAN), whosturn, 300);
 
         plane.setAlignment(Pos.CENTER);
         VBox vbox = new VBox(whosturn,plane);

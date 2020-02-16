@@ -1,9 +1,11 @@
 package tictactoe.games;
 
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.GridPane;
 import lombok.EqualsAndHashCode;
 import tictactoe.AI;
 import tictactoe.Main;
@@ -13,9 +15,8 @@ import java.util.Optional;
 /**
  * Graphical interface for the Kamisado Game. Extends javafx's GridPane.
  * Represents the game's table as a grid of buttons.
- * TODO: draw towers on buttons, color everything, fill up buttons array
  */
-public class KamisadoPlane {
+public class KamisadoPlane extends GridPane {
     private final Kamisado game;
     private final Label whosturn;
     private final KamisadoButton[][] buttons = new KamisadoButton[8][8];
@@ -24,33 +25,58 @@ public class KamisadoPlane {
     public KamisadoPlane(Kamisado game, Label whosturn, int width){
         this.game = game;
         this.whosturn = whosturn;
-    }
-
-    private void moveTower(Kamisado.Step step){
-        int oldI = step.tower.getI();
-        int oldJ = step.tower.getJ();
-        buttons[oldI][oldJ].step = new Kamisado.Step(null, oldI, oldJ);
-        buttons[step.i][step.j].step = step;
+        for (int i=0; i<8; i++){
+            for (int j=0; j<8; j++) {
+                KamisadoButton button = new KamisadoButton(i, j, width / 8);
+                button.setBackground(new Background(new BackgroundFill(Kamisado.colorMap[i][j], null, null)));
+                button.drawTower();
+                buttons[i][j] = button;
+                this.add(button, j, i, 1, 1);
+            }
+        }
+        enableButtons();
     }
 
     private void enableButtons(){
         for (KamisadoButton[] arr: buttons) {
-            for (Button b : arr) {b.setDisable(true);}
-        }
-        if (game.getWhosTurn() == Player.COMPUTER) {return;}
-
-        if (activeTower == null) {
-            //enable towers
-            for (Kamisado.Tower tower : game.getPlayerTowers()[Player.HUMAN.ordinal()]) {
-                buttons[tower.getI()][tower.getJ()].setDisable(false);
-
+            for (Button b : arr) {
+                b.setDisable(true);
+                b.setStyle("-fx-border-width: 1px;");
             }
-        } else {
-            //enable possible target fields
+
+        }
+        //if (game.getWhosTurn() == Player.COMPUTER) {return;}
+
+        //enable towers
+        for (Kamisado.Tower tower : game.getPlayerTowers()[Player.HUMAN.ordinal()]) {
+            buttons[tower.getI()][tower.getJ()].setDisable(false);
+            buttons[tower.getI()][tower.getJ()].setStyle("-fx-border-width: 2px;");
+
+        }
+
+        //enable possible target fields
+        if (activeTower != null) {
             for (Kamisado.Step step : game.getNextSteps(activeTower)) {
-                buttons[step.i][step.j].setDisable(false);
+                buttons[step.toI][step.toJ].setDisable(false);
+                buttons[step.toI][step.toJ].setStyle("-fx-border-width: 3px;");
             }
         }
+    }
+
+    /**
+     * Making a step on the game's board representation.
+     * @param step An in-game Step object.
+     */
+    private void makePlaneStep(Kamisado.Step step){
+
+        game.makeStep(step);
+        buttons[step.fromI][step.fromJ].drawTower();
+        buttons[step.toI][step.toJ].drawTower();
+
+        game.getWinner().ifPresentOrElse(
+                winner -> whosturn.setText("WINNER: " + winner.toString()),
+                () -> whosturn.setText(game.getWhosTurn().toString())
+        );
     }
 
 
@@ -59,52 +85,57 @@ public class KamisadoPlane {
      */
     @EqualsAndHashCode(callSuper = true)
     class KamisadoButton extends Button {
-        Kamisado.Step step;
+        public final int i, j;
 
-        public  KamisadoButton(Kamisado.Step step, int width){
+        public  KamisadoButton(int i, int j, int width){
             super();
-            this.step = step;
+            this.i = i;
+            this.j = j;
             this.setPrefSize(width,width);
-            super.setOnAction(click);
+            super.setOnAction(this::click);
         }
 
-        private EventHandler<ActionEvent> click = value -> {
-            if (!this.getText().equals("") || game.getWinner().isPresent()) return;
+        private void click (ActionEvent actionEvent) {
+            if (game.getWinner().isPresent()) return;
 
-            //select a tower
-            if (this.step.tower != null) {
-                activeTower = this.step.tower;
-                return;
+            //select a tower on this field
+            if (game.getTable()[i][j] != null) {
+                activeTower = game.getTable()[i][j];
             }
             // move a tower
             else {
                 try {
                     //Player' move
-                    Kamisado.Step newStep = new Kamisado.Step(activeTower, this.step.i, this.step.j);
-                    moveTower(newStep);
-                    game.makeStep(newStep);
-                    if (game.getWinner().isPresent()) {
-                        whosturn.setText("WINNER: " + game.getWinner().get().toString());
-                        return;
-                    }
-                    whosturn.setText("COMPUTER");
+                    makePlaneStep(new Kamisado.Step(activeTower.getI(), activeTower.getJ(), i, j));
+                    activeTower = null;
                     //computer's move
+                    if (game.getWinner().isPresent()) return;
                     Optional<Kamisado.Step> aiStep = AI.getNextStep(game, Main.AIDEPTH);
-                    aiStep.ifPresentOrElse(s -> {
-                        moveTower(s);
-                        game.makeStep(s);
-                    }, game::skipStep);
-                    if (game.getWinner().isPresent()) {
-                        whosturn.setText("WINNER: " + game.getWinner().get().toString());
-                        return;
-                    }
-                    whosturn.setText("PLAYER");
+                    aiStep.ifPresentOrElse(
+                            KamisadoPlane.this::makePlaneStep,
+                            game::skipStep
+                    );
+                    whosturn.setText(game.getWhosTurn().toString());
                 } catch (Exception e){
                     e.printStackTrace();
                 }
             }
 
             enableButtons();
-        };
+        }
+
+        public void drawTower(){
+            if (game.getTable()[i][j] == null) {
+                this.setText("");
+                //this.setShape(null);
+            }
+            else {
+                this.setText(Kamisado.colorMap[i][j].toString());
+                //Circle circle = new Circle();
+                //circle.setRadius(this.getWidth()/20);
+                //circle.setFill(this.step.tower.getColor());
+                //this.setShape(circle);
+            }
+        }
     }
 }

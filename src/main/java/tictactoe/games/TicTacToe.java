@@ -1,5 +1,6 @@
 package tictactoe.games;
 
+import javafx.util.Pair;
 import lombok.Data;
 import tictactoe.Game;
 import tictactoe.Player;
@@ -19,7 +20,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     private final int[][] table;
     private int[][] series;
     private int score = 0;
-    private LinkedList<Optional<Step>> steps = new LinkedList<>();
+    private LinkedList<Pair<Player, Optional<Step>>> steps = new LinkedList<>();
     private Player whosTurn;
     private Player winner;
 
@@ -58,7 +59,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
         }
 
         table[step.i][step.j] = whosTurn.ordinal()+1;
-        steps.add(Optional.of(step));
+        steps.add(new Pair<>(whosTurn, Optional.of(step)));
         whosTurn = whosTurn.next();
         calculateScore();
     }

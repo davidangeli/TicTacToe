@@ -34,7 +34,7 @@ public class TicTacToePlane extends GridPane {
     }
 
     /**
-     * making a step on the game's board representation.
+     * Making a step on the game's board representation.
      * @param step An in-game Step object.
      */
     private void makePlaneStep(TicTacToe.Step step){
@@ -42,7 +42,7 @@ public class TicTacToePlane extends GridPane {
         game.makeStep(step);
         buttons[step.i][step.j].setText(mark);
         game.getWinner().ifPresentOrElse(
-                winner -> whosturn.setText(winner.toString()),
+                winner -> whosturn.setText("WINNER: " + winner.toString()),
                 () -> whosturn.setText(game.getWhosTurn().toString())
         );
     }
@@ -70,7 +70,7 @@ public class TicTacToePlane extends GridPane {
                 if (game.getWinner().isPresent()) return;
                 //Computer's move - no step option is not really possible in TicTacToe
                 Optional<TicTacToe.Step> step2 = AI.getNextStep(game, Main.AIDEPTH);
-                step2.ifPresent(s -> makePlaneStep(step));
+                step2.ifPresent(TicTacToePlane.this::makePlaneStep);
             } catch (Exception e){
                 e.printStackTrace();
             }
