@@ -6,6 +6,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
+import javafx.scene.shape.Circle;
+import javafx.scene.paint.Color;
 import lombok.EqualsAndHashCode;
 import tictactoe.AI;
 import tictactoe.Main;
@@ -23,11 +25,13 @@ public class KamisadoPlane extends GridPane {
     private Kamisado.Tower activeTower = null;
 
     public KamisadoPlane(Kamisado game, Label whosturn, int width){
+        setHgap(2);
+        setVgap(2);
         this.game = game;
         this.whosturn = whosturn;
         for (int i=0; i<8; i++){
             for (int j=0; j<8; j++) {
-                KamisadoButton button = new KamisadoButton(i, j, width / 8);
+                KamisadoButton button = new KamisadoButton(i, j, width / 10);
                 button.setBackground(new Background(new BackgroundFill(Kamisado.colorMap[i][j], null, null)));
                 button.drawTower();
                 buttons[i][j] = button;
@@ -49,16 +53,16 @@ public class KamisadoPlane extends GridPane {
 
         //enable towers
         for (Kamisado.Tower tower : game.getPlayerTowers()[Player.HUMAN.ordinal()]) {
-            buttons[tower.getI()][tower.getJ()].setDisable(false);
-            buttons[tower.getI()][tower.getJ()].setStyle("-fx-border-width: 2px;");
-
-        }
+            if (game.getSteps().isEmpty() || game.getSteps().getLast().getValue().isEmpty() || game.getSteps().getLast().getValue().get().getToFieldColor() == tower.color) {
+                buttons[tower.getI()][tower.getJ()].setDisable(false);
+                buttons[tower.getI()][tower.getJ()].setStyle("-fx-border-color: #f00000; -fx-border-width: 2px;");
+            }}
 
         //enable possible target fields
         if (activeTower != null) {
             for (Kamisado.Step step : game.getNextSteps(activeTower)) {
                 buttons[step.toI][step.toJ].setDisable(false);
-                buttons[step.toI][step.toJ].setStyle("-fx-border-width: 3px;");
+                buttons[step.toI][step.toJ].setStyle("-fx-border-color: #f00000; -fx-border-width: 2px;");
             }
         }
     }
@@ -68,7 +72,6 @@ public class KamisadoPlane extends GridPane {
      * @param step An in-game Step object.
      */
     private void makePlaneStep(Kamisado.Step step){
-
         game.makeStep(step);
         buttons[step.fromI][step.fromJ].drawTower();
         buttons[step.toI][step.toJ].drawTower();
@@ -79,18 +82,27 @@ public class KamisadoPlane extends GridPane {
         );
     }
 
+    /**
+     * Passing a step on the game's board representation (bc no other available moves).
+     */
+    private void skipPlaneStep (){
+        game.skipStep();
+        whosturn.setText(game.getWhosTurn().toString());
+    }
+
 
     /**
      * This subclass of javafx's Button contains a preindexed TicTacToeGame.Step.
      */
     @EqualsAndHashCode(callSuper = true)
     class KamisadoButton extends Button {
-        public final int i, j;
+        public final int i, j, width;
 
         public  KamisadoButton(int i, int j, int width){
             super();
             this.i = i;
             this.j = j;
+            this.width = width;
             this.setPrefSize(width,width);
             super.setOnAction(this::click);
         }
@@ -113,9 +125,8 @@ public class KamisadoPlane extends GridPane {
                     Optional<Kamisado.Step> aiStep = AI.getNextStep(game, Main.AIDEPTH);
                     aiStep.ifPresentOrElse(
                             KamisadoPlane.this::makePlaneStep,
-                            game::skipStep
+                            KamisadoPlane.this::skipPlaneStep
                     );
-                    whosturn.setText(game.getWhosTurn().toString());
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -126,15 +137,17 @@ public class KamisadoPlane extends GridPane {
 
         public void drawTower(){
             if (game.getTable()[i][j] == null) {
-                this.setText("");
-                //this.setShape(null);
+                //this.setText("");
+                this.setGraphic(null);
             }
             else {
-                this.setText(Kamisado.colorMap[i][j].toString());
-                //Circle circle = new Circle();
-                //circle.setRadius(this.getWidth()/20);
-                //circle.setFill(this.step.tower.getColor());
-                //this.setShape(circle);
+                //this.setText(Kamisado.colorMap[i][j].toString());
+                Circle circle = new Circle();
+                circle.setRadius(width/5);
+                circle.setFill(game.getTable()[i][j].getColor());
+                circle.setStroke(Color.BLACK);
+                circle.setStrokeWidth(2);
+                this.setGraphic(circle);
             }
         }
     }

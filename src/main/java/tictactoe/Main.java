@@ -27,12 +27,12 @@ public class Main extends Application {
         stage.setTitle("Tic-Tac-Toe");
         Label whosturn = new Label("PLAYER");
         //TicTacToePlane plane = new TicTacToePlane(new TicTacToe (SIZE, WINS, Player.HUMAN), whosturn, 300);
-        KamisadoPlane plane = new KamisadoPlane(new Kamisado(Player.HUMAN), whosturn, 300);
+        KamisadoPlane plane = new KamisadoPlane(new Kamisado(Player.HUMAN), whosturn, 400);
 
         plane.setAlignment(Pos.CENTER);
         VBox vbox = new VBox(whosturn,plane);
         vbox.setAlignment(Pos.CENTER);
-        stage.setScene(new Scene(vbox, 320, 480));
+        stage.setScene(new Scene(vbox, 420, 480));
         stage.show();
     }
 }
