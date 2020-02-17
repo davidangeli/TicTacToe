@@ -12,11 +12,11 @@ import java.util.Optional;
  */
 @Data
 public class TicTacToe implements Game<TicTacToe.Step> {
-
+    //tictactoe specifics
+    private final static int SIZE = 10, WINS = 5;
     //getNextStates will only consider fields with a proximity to already marked fields
     private final static int VIABILITYDISTANCE = 1;
 
-    private final int size, wins;
     private final int[][] table;
     private int[][] series;
     private int score = 0;
@@ -24,11 +24,9 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     private Player whosTurn;
     private Player winner;
 
-    public TicTacToe(int size, int wins, Player starts) {
-        this.size = size;
-        this.wins = wins;
+    public TicTacToe(Player starts) {
         whosTurn = starts;
-        table = new int[size][size];
+        table = new int[SIZE][SIZE];
     }
 
     /**
@@ -40,11 +38,9 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     private TicTacToe(TicTacToe other, Step step) throws IllegalArgumentException {
         if (other.table[step.i][step.j] != 0) throw new IllegalArgumentException("Field is not null.");
 
-        this.size = other.size;
-        this.wins = other.wins;
         whosTurn = other.whosTurn;
-        table = new int[size][size];
-        for (int i=0; i < size; i++){
+        table = new int[SIZE][SIZE];
+        for (int i=0; i < SIZE; i++){
             table[i] = other.table[i].clone();
         }
 
@@ -54,7 +50,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
 
     @Override
     public void makeStep(Step step) throws IllegalArgumentException {
-        if (step.i<0 || step.j<0 || step.i>=size || step.j>=size || table[step.i][step.j] != 0) {
+        if (step.i<0 || step.j<0 || step.i>=SIZE || step.j>=SIZE || table[step.i][step.j] != 0) {
             throw new IllegalArgumentException("Illegal step indexes.");
         }
 
@@ -77,9 +73,9 @@ public class TicTacToe implements Game<TicTacToe.Step> {
     public boolean isAStepViable(Step step) {
         boolean viable = false;
         int minrow = Math.max(0,step.i-VIABILITYDISTANCE);
-        int maxrow = Math.min(size,step.i+VIABILITYDISTANCE+1);
+        int maxrow = Math.min(SIZE,step.i+VIABILITYDISTANCE+1);
         int mincol = Math.max(0,step.j-VIABILITYDISTANCE);
-        int maxcol = Math.min(size,step.j+VIABILITYDISTANCE+1);
+        int maxcol = Math.min(SIZE,step.j+VIABILITYDISTANCE+1);
 
         for (int ii = minrow; ii < maxrow; ii++){
             int jj = mincol;
@@ -102,8 +98,8 @@ public class TicTacToe implements Game<TicTacToe.Step> {
         LinkedList<Step> result = new LinkedList<>();
         if (winner != null) return result;
 
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
                 if (table[i][j] == 0){
                     Step step = new Step(i,j);
                     if (isAStepViable(step)) result.add(step);
@@ -159,13 +155,13 @@ public class TicTacToe implements Game<TicTacToe.Step> {
         //checks 3 steps back from the winning length, and weights with 10000, 100, 1
         score = 0;
         for (int i = 0; i < 3; i++) {
-            score += series[Player.COMPUTER.ordinal()+1][wins-i] * (int)Math.pow(10,4-2*i);
-            score -= series[Player.HUMAN.ordinal()+1][wins-i] * (int)Math.pow(10,4-2*i);
+            score += series[Player.COMPUTER.ordinal()+1][WINS-i] * (int)Math.pow(10,4-2*i);
+            score -= series[Player.HUMAN.ordinal()+1][WINS-i] * (int)Math.pow(10,4-2*i);
         }
 
         //update winner field if won
-        if (series[Player.COMPUTER.ordinal()+1][wins] != 0 && winner == null) setWinner(Player.COMPUTER);
-        if (series[Player.HUMAN.ordinal()+1][wins] != 0 && winner == null)    setWinner(Player.HUMAN);
+        if (series[Player.COMPUTER.ordinal()+1][WINS] != 0 && winner == null) setWinner(Player.COMPUTER);
+        if (series[Player.HUMAN.ordinal()+1][WINS] != 0 && winner == null)    setWinner(Player.HUMAN);
     }
 
     /**
@@ -174,17 +170,17 @@ public class TicTacToe implements Game<TicTacToe.Step> {
      */
     private int[][] countSeries () {
         //for simplicity, we grind through series of 0-s also.
-        int[][] results = new int[3][size+1];
+        int[][] results = new int[3][SIZE+1];
 
-        for (int n = 1-size; n < size; n++) {
+        for (int n = 1-SIZE; n < SIZE; n++) {
             int countd1 = 0, countd2 = 0, countr = 1, countc = 1;
             int befored1 = -1, befored2 = -1, beforer = -1, beforec = -1;
-            for (int i = 0; i <= size; i++) {
+            for (int i = 0; i <= SIZE; i++) {
                 int j = i-n;
-                int j2 = size-j-1;
+                int j2 = SIZE-j-1;
 
                 //rows and columns checking from n=1
-                if (n > 0 && i > 0 && i < size){
+                if (n > 0 && i > 0 && i < SIZE){
                     //end of a series in rows
                     if (table[n][i] != table[n][i-1]) {
                         results[table[n][i-1]][countr] += seriesValue(beforer, table[n][i-1], table[n][i], countr);
@@ -202,15 +198,15 @@ public class TicTacToe implements Game<TicTacToe.Step> {
                 }
                 //end of rows and columns
                 else if (n>0) {
-                    results[table[n][size-1]][countr] += seriesValue(beforer, table[n][size-1], -1, countr);
-                    results[table[size-1][n]][countc] += seriesValue(beforec, table[size-1][n], -1, countc);
+                    results[table[n][SIZE-1]][countr] += seriesValue(beforer, table[n][SIZE-1], -1, countr);
+                    results[table[SIZE-1][n]][countc] += seriesValue(beforec, table[SIZE-1][n], -1, countc);
                 }
 
                 // diagonals check, valid indexes
-                if ((j >= 0) && (j <= size)){
+                if ((j >= 0) && (j <= SIZE)){
 
-                    // j==size or i==size option means out of bound index, but enables checking on series ending at boundaries
-                    if (i== size || j==size){
+                    // j==SIZE or i==SIZE option means out of bound index, but enables checking on series ending at boundaries
+                    if (i== SIZE || j==SIZE){
                         results[table[i-1][j-1]][countd1] += seriesValue(befored1, table[i-1][j-1], -1, countd1);
                         results[table[i-1][j2+1]][countd2] += seriesValue(befored2, table[i-1][j2+1], -1, countd2);
                     }
@@ -253,7 +249,7 @@ public class TicTacToe implements Game<TicTacToe.Step> {
         //not null series, open on both side : counts double
         if (ending != 0 && before == 0 && current == 0) return 2;
         //not null series, open only on one side or winner length
-        if (ending != 0 && (before == 0 || current == 0 || count >= wins)) return 1;
+        if (ending != 0 && (before == 0 || current == 0 || count >= WINS)) return 1;
         //other closed series do not count for now
         return 0;
     }

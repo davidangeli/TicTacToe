@@ -10,7 +10,7 @@ public class ScoringTest {
 
     @Test
     public void testScoring(){
-        TicTacToe mygame = new TicTacToe(10,5, Player.COMPUTER);
+        TicTacToe mygame = new TicTacToe(Player.COMPUTER);
         mygame.makeStep(new TicTacToe.Step(0,0));
         mygame.makeStep(new TicTacToe.Step(2,2));
         mygame.makeStep(new TicTacToe.Step(0,1));

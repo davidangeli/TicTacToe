@@ -33,6 +33,7 @@ public class KamisadoPlane extends GridPane {
         setVgap(2);
         this.game = game;
         this.whosturn = whosturn;
+        this.whosturn.setText(game.getWhosTurn().toString());
         //kamisado field buttons
         for (int i=0; i<8; i++){
             for (int j=0; j<8; j++) {

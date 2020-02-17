@@ -10,11 +10,11 @@ public class AITest {
 
     @Test
     public void testAI() {
-        TicTacToe mygame = new TicTacToe(10,5,Player.HUMAN);
+        TicTacToe mygame = new TicTacToe(Player.HUMAN);
         int size = mygame.getTable().length;
 
         //1 imitate human step, then an ai step
-        mygame.makeStep(new TicTacToe.Step(size/2,size/2));
+        mygame.makeStep(new TicTacToe.Step(size/2 - 1,size/2 - 1));
         mygame.makeStep(AI.getNextStep(mygame, AIDEPTH).get());
 
         //2-3-4-5
@@ -23,7 +23,7 @@ public class AITest {
             mygame.makeStep(AI.getNextStep(mygame, AIDEPTH).get());
         }
 
-        assertEquals(mygame.getSteps().element().getValue().get(), new TicTacToe.Step(size/2,size/2));
+        assertEquals(mygame.getSteps().element().getValue().get(), new TicTacToe.Step(size/2 - 1,size/2 - 1));
         assertEquals(mygame.getSteps().size(), 12);
     }
 

@@ -1,9 +1,14 @@
 package tictactoe;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tictactoe.games.Kamisado;
@@ -14,8 +19,10 @@ import tictactoe.games.TicTacToePlane;
 public class Main extends Application {
     //sets the depth of the minimax search on the game trees
     public static final int AIDEPTH = 2;
-    //tictactoe specifics
-    private final static int SIZE = 10, WINS = 5;
+    public static final int WIDTH = 400;
+
+    private Label whosturn;
+    private VBox contentBox;
 
     public static void main(String[] args) {
         launch(args);
@@ -25,14 +32,38 @@ public class Main extends Application {
     public void start(Stage stage) {
 
         stage.setTitle("Tic-Tac-Toe");
-        Label whosturn = new Label("PLAYER");
-        //TicTacToePlane plane = new TicTacToePlane(new TicTacToe (SIZE, WINS, Player.HUMAN), whosturn, 300);
-        KamisadoPlane plane = new KamisadoPlane(new Kamisado(Player.HUMAN), whosturn, 400);
+        whosturn = new Label("");
+        GridPane pane = new GridPane();
+        pane.setAlignment(Pos.CENTER);
+        MenuBar menuBar = setMenuBar();
+        contentBox = new VBox(20);
+        contentBox.setPadding(new Insets(15, 12, 15, 12));
+        contentBox.getChildren().addAll( menuBar, whosturn, pane);
 
-        plane.setAlignment(Pos.CENTER);
-        VBox vbox = new VBox(whosturn,plane);
-        vbox.setAlignment(Pos.CENTER);
-        stage.setScene(new Scene(vbox, 420, 480));
+        stage.setScene(new Scene(contentBox, WIDTH+ 24, 480));
         stage.show();
+    }
+
+    private MenuBar setMenuBar () {
+        Menu menu = new Menu("New Game");
+
+        MenuItem menuItem1 = new MenuItem("TicTacToe");
+        menuItem1.setOnAction(e -> {
+            GridPane pane = new TicTacToePlane(new TicTacToe (Player.HUMAN), whosturn, WIDTH);
+            pane.setAlignment(Pos.CENTER);
+            contentBox.getChildren().set(2, pane);
+        });
+        MenuItem menuItem2 = new MenuItem("Kamisado");
+        menuItem2.setOnAction(e -> {
+            KamisadoPlane pane = new KamisadoPlane(new Kamisado (Player.HUMAN), whosturn, WIDTH);
+            contentBox.getChildren().set(2, pane);
+            pane.setAlignment(Pos.CENTER);
+        });
+
+        menu.getItems().add(menuItem1);
+        menu.getItems().add(menuItem2);
+        MenuBar menuBar = new MenuBar();
+        menuBar.getMenus().add(menu);
+        return menuBar;
     }
 }

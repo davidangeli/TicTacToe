@@ -4,7 +4,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import lombok.EqualsAndHashCode;
 import tictactoe.AI;
 import tictactoe.Main;
@@ -21,12 +24,16 @@ public class TicTacToePlane extends GridPane {
     private final TicTacToeButton[][] buttons;
 
     public TicTacToePlane(TicTacToe game, Label whosturn, int width){
+        setHgap(1);
+        setVgap(1);
         this.game = game;
         this.whosturn = whosturn;
-        this.buttons = new TicTacToeButton[game.getSize()][game.getSize()];
-        for (int i=0; i<game.getSize(); i++){
-            for (int j=0; j<game.getSize(); j++){
-                TicTacToeButton button = new TicTacToeButton(new TicTacToe.Step(i,j), width/game.getSize());
+        this.whosturn.setText(game.getWhosTurn().toString());
+        int size = game.getTable().length;
+        this.buttons = new TicTacToeButton[size][size];
+        for (int i=0; i<size; i++){
+            for (int j=0; j<size; j++){
+                TicTacToeButton button = new TicTacToeButton(new TicTacToe.Step(i,j), width/size -1);
                 buttons[i][j] = button;
                 this.add(button, j, i, 1, 1);
             }
@@ -58,6 +65,7 @@ public class TicTacToePlane extends GridPane {
             super();
             this.step = step;
             this.setPrefSize(width,width);
+            this.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
             super.setOnAction(click);
         }
 
