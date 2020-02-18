@@ -3,15 +3,18 @@ package tictactoe.games;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import lombok.Data;
-import tictactoe.Game;
+import lombok.EqualsAndHashCode;
+import tictactoe.AI;
+import tictactoe.AbstractGame;
 import tictactoe.Player;
 import java.util.*;
 
 /**
  * Kamisado class implements the kamisado game.
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Kamisado implements Game<Kamisado.Step> {
+public class Kamisado extends AbstractGame<Kamisado.Step> {
 
     public static final Color[][] colorMap =  {
             { Color.ORANGE, Color.BLUE, Color.PURPLE, Color.PINK, Color.YELLOW, Color.RED, Color.GREEN, Color.BROWN },
@@ -24,14 +27,10 @@ public class Kamisado implements Game<Kamisado.Step> {
             { Color.BROWN, Color.GREEN, Color.RED, Color.YELLOW, Color.PINK, Color.PURPLE, Color.BLUE, Color.ORANGE }
     };
     private final Tower[][] table = new Tower[8][8];
-    private int score = 0;
-    private LinkedList<Pair<Player, Optional<Step>>> steps = new LinkedList<>();
     private final Tower[][] playerTowers = new Tower[2][8];
-    private Player whosTurn;
-    private Player winner;
 
-    public Kamisado (Player starts) {
-        whosTurn = starts;
+    public Kamisado (Player starts, AI ai) {
+        super(starts, ai);
 
         //set up towers to table's first (COMPUTER) and last (HUMAN) row, with colors matching the colormap
             for (int j = 0; j < 8; j++) {
@@ -43,21 +42,40 @@ public class Kamisado implements Game<Kamisado.Step> {
     }
 
     /**
-     * Constructor from an existing Kamisado with making an in-game step. Throws InvalidAttributeException
-     * if the step can not be made.
-     * @param other The original game Kamisado.
-     * @param step The steps being made.
+     * {@inheritDoc}
+     * In Kamisado, this list is not filtered: contains all possible steps.
+     * @return
      */
-    private Kamisado (Kamisado other, Player starts, Step step) {
-        this(starts);
-        other.steps.forEach(s -> s.getValue().ifPresentOrElse(
-                this::makeStep,
-                this::skipStep));
-        makeStep(step);
+    @Override
+    public LinkedList<Step> getNextSteps() {
+        LinkedList<Step> result = new LinkedList<>();
+        if (winner != null) return result;
+
+        for (Tower tower : playerTowers[whosTurn.ordinal()]) {
+            result.addAll(getNextSteps(tower));
+        }
+        return result;
+    }
+
+
+    @Override
+    protected AbstractGame<Kamisado.Step> getNextState(Kamisado.Step step) throws IllegalArgumentException {
+
+        Player pl = steps.isEmpty() ? whosTurn : steps.getFirst().getKey();
+        Kamisado nextState = new Kamisado(pl, ai);
+
+        //Kamisado Steps have only final primitive members
+        steps.forEach(s -> s.getValue().ifPresentOrElse(
+                st -> nextState.makeStep(st, false),
+                nextState::skipStep)
+        );
+
+        nextState.makeStep(step, true);
+        return nextState;
     }
 
     @Override
-    public void makeStep(Step step) throws IllegalArgumentException {
+    public void makeStep(Step step, boolean updateScore) throws IllegalArgumentException {
         if (step.toI < 0 || step.toJ < 0 || step.toI >= 8 || step.toJ >= 8 || table[step.toI][step.toJ] != null) {
             throw new IllegalArgumentException("Illegal step indexes");
         }
@@ -71,29 +89,7 @@ public class Kamisado implements Game<Kamisado.Step> {
 
         steps.add(new Pair<>(whosTurn, Optional.of(step)));
         whosTurn = whosTurn.next();
-        calculateScore();
-    }
-
-    @Override
-    public void skipStep() {
-        steps.add(new Pair<>(whosTurn, Optional.empty()));
-        whosTurn = whosTurn.next();
-    }
-
-    /**
-     * {@inheritDoc}
-     * In tictactoe, this list is not filtered: contains all possible steps.
-     * @return
-     */
-    @Override
-    public LinkedList<Step> getNextSteps() {
-        LinkedList<Step> result = new LinkedList<>();
-        if (winner != null) return result;
-
-        for (Tower tower : playerTowers[whosTurn.ordinal()]) {
-            result.addAll(getNextSteps(tower));
-        }
-        return result;
+        if (updateScore) calculateScore();
     }
 
     /**
@@ -133,26 +129,6 @@ public class Kamisado implements Game<Kamisado.Step> {
             i += dir;
         }
         return result;
-    }
-
-    @Override
-    public LinkedList<Game<Step>> getNextStates() {
-        LinkedList<Game<Step>> result = new LinkedList<>();
-        for (Step step : getNextSteps()){
-            try {
-                Player pl = steps.isEmpty() ? whosTurn : steps.getFirst().getKey();
-                result.add(new Kamisado(this, pl, step));
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public Optional<Player> getWinner() {
-        if (winner == null) return Optional.empty();
-        return Optional.of(winner);
     }
 
     /**
@@ -216,10 +192,5 @@ public class Kamisado implements Game<Kamisado.Step> {
         Color getToFieldColor() {
             return colorMap[toI][toJ];
         }
-        Color getFromFieldColor() {
-            return colorMap[fromI][fromJ];
-        }
-
-
     }
 }

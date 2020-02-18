@@ -11,6 +11,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import tictactoe.ai.MiniMaxAI;
 import tictactoe.games.Kamisado;
 import tictactoe.games.KamisadoPlane;
 import tictactoe.games.TicTacToe;
@@ -49,13 +50,13 @@ public class Main extends Application {
 
         MenuItem menuItem1 = new MenuItem("TicTacToe");
         menuItem1.setOnAction(e -> {
-            GridPane pane = new TicTacToePlane(new TicTacToe (Player.HUMAN), whosturn, WIDTH);
+            GridPane pane = new TicTacToePlane(new TicTacToe(Player.HUMAN, new MiniMaxAI(AIDEPTH)), whosturn, WIDTH);
             pane.setAlignment(Pos.CENTER);
             contentBox.getChildren().set(2, pane);
         });
         MenuItem menuItem2 = new MenuItem("Kamisado");
         menuItem2.setOnAction(e -> {
-            KamisadoPlane pane = new KamisadoPlane(new Kamisado (Player.HUMAN), whosturn, WIDTH);
+            KamisadoPlane pane = new KamisadoPlane(new Kamisado (Player.HUMAN, new MiniMaxAI(AIDEPTH)), whosturn, WIDTH);
             contentBox.getChildren().set(2, pane);
             pane.setAlignment(Pos.CENTER);
         });

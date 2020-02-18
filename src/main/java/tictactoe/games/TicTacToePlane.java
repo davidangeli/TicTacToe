@@ -9,8 +9,6 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import lombok.EqualsAndHashCode;
-import tictactoe.AI;
-import tictactoe.Main;
 import tictactoe.Player;
 import java.util.Optional;
 
@@ -29,7 +27,7 @@ public class TicTacToePlane extends GridPane {
         this.game = game;
         this.whosturn = whosturn;
         this.whosturn.setText(game.getWhosTurn().toString());
-        int size = game.getTable().length;
+        int size = game.getSize();
         this.buttons = new TicTacToeButton[size][size];
         for (int i=0; i<size; i++){
             for (int j=0; j<size; j++){
@@ -44,9 +42,8 @@ public class TicTacToePlane extends GridPane {
      * Making a step on the game's board representation.
      * @param step An in-game Step object.
      */
-    private void makePlaneStep(TicTacToe.Step step){
+    private void updateBoard(TicTacToe.Step step){
         String mark = game.getWhosTurn() == Player.COMPUTER ? "O" : "X";
-        game.makeStep(step);
         buttons[step.i][step.j].setText(mark);
         game.getWinner().ifPresentOrElse(
                 winner -> whosturn.setText("WINNER: " + winner.toString()),
@@ -74,16 +71,16 @@ public class TicTacToePlane extends GridPane {
 
             try {
                 //Player' move
-                makePlaneStep(step);
+                game.makeStep(step, true);
+                updateBoard(step);
                 if (game.getWinner().isPresent()) return;
                 //Computer's move - no step option is not really possible in TicTacToe
-                Optional<TicTacToe.Step> step2 = AI.getNextStep(game, Main.AIDEPTH);
-                step2.ifPresent(TicTacToePlane.this::makePlaneStep);
-            } catch (Exception e){
+                Optional<TicTacToe.Step> step2 = game.makeAIStep();
+                step2.ifPresent(TicTacToePlane.this::updateBoard);
+            } catch (IllegalArgumentException e){
                 e.printStackTrace();
             }
         };
     }
-
 
 }

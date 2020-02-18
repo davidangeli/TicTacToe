@@ -1,5 +1,5 @@
 import org.junit.jupiter.api.Test;
-import tictactoe.AI;
+import tictactoe.ai.MiniMaxAI;
 import tictactoe.Player;
 import tictactoe.games.TicTacToe;
 
@@ -10,21 +10,21 @@ public class AITest {
 
     @Test
     public void testAI() {
-        TicTacToe mygame = new TicTacToe(Player.HUMAN);
-        int size = mygame.getTable().length;
+        TicTacToe mygame = new TicTacToe(Player.HUMAN, new MiniMaxAI(2));
+        int size = mygame.getSize();
 
         //1 imitate human step, then an ai step
-        mygame.makeStep(new TicTacToe.Step(size/2 - 1,size/2 - 1));
-        mygame.makeStep(AI.getNextStep(mygame, AIDEPTH).get());
+        mygame.makeStep(new TicTacToe.Step(size/2 - 1,size/2 - 1), true);
+        mygame.makeAIStep();
 
         //2-3-4-5
         for (int i = 0; i < 5; i++) {
-            mygame.makeStep(mygame.getNextSteps().getLast());
-            mygame.makeStep(AI.getNextStep(mygame, AIDEPTH).get());
+            mygame.makeStep(mygame.getNextSteps().getLast(), true);
+            mygame.makeAIStep();
         }
 
         assertEquals(mygame.getSteps().element().getValue().get(), new TicTacToe.Step(size/2 - 1,size/2 - 1));
-        assertEquals(mygame.getSteps().size(), 12);
+        assertEquals(12, mygame.getSteps().size());
     }
 
 }

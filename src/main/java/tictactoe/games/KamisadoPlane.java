@@ -11,8 +11,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import lombok.EqualsAndHashCode;
-import tictactoe.AI;
-import tictactoe.Main;
 import tictactoe.Player;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -45,9 +43,13 @@ public class KamisadoPlane extends GridPane {
 
         //skipbutton
         skipButton = new Button("Skip");
-        skipButton.setOnAction(e -> skipPlaneStep());
+        skipButton.setOnAction(e -> {
+            game.skipStep();
+            updateBoard(Optional.empty());
+            Optional<Kamisado.Step> aiStep = game.makeAIStep();
+            updateBoard(aiStep);
+        });
         this.add(skipButton, 7, 8, 1, 1);
-
         enableButtons();
     }
 
@@ -56,7 +58,10 @@ public class KamisadoPlane extends GridPane {
      */
     private void enableButtons(){
         //disable all
-        this.getChildren().forEach(c -> c.setDisable(true));
+        this.getChildren().forEach(c -> {
+            c.setDisable(true);
+            c.setStyle("");
+        });
         if (game.getWinner().isPresent()) return;
 
         //enable towers if color matches last step, or first move
@@ -79,27 +84,22 @@ public class KamisadoPlane extends GridPane {
         }
     }
 
+    //TODO: rethink without the use of Optional<> as parameter
     /**
      * Making a step on the game's board representation.
      * @param step An in-game Step object.
      */
-    private void makePlaneStep(Kamisado.Step step){
-        game.makeStep(step);
-        buttons[step.fromI][step.fromJ].drawTower();
-        buttons[step.toI][step.toJ].drawTower();
+    private void updateBoard(Optional<Kamisado.Step> step){
+        step.ifPresent( st -> {
+            buttons[st.fromI][st.fromJ].drawTower();
+            buttons[st.toI][st.toJ].drawTower();
+            activeTower = null;
+        });
 
         game.getWinner().ifPresentOrElse(
                 winner -> whosturn.setText("WINNER: " + winner.toString()),
                 () -> whosturn.setText(game.getWhosTurn().toString())
         );
-    }
-
-    /**
-     * Passing a step on the game's board representation (bc no other available moves).
-     */
-    private void skipPlaneStep (){
-        game.skipStep();
-        whosturn.setText(game.getWhosTurn().toString());
     }
 
     /**
@@ -131,20 +131,17 @@ public class KamisadoPlane extends GridPane {
             else {
                 try {
                     //Player' move
-                    makePlaneStep(new Kamisado.Step(activeTower.getI(), activeTower.getJ(), i, j));
-                    activeTower = null;
-                    //computer's move
+                    Kamisado.Step step = new Kamisado.Step(activeTower.getI(), activeTower.getJ(), i, j);
+                    game.makeStep(step, true);
+                    updateBoard(Optional.of(step));
                     if (game.getWinner().isPresent()) return;
-                    Optional<Kamisado.Step> aiStep = AI.getNextStep(game, Main.AIDEPTH);
-                    aiStep.ifPresentOrElse(
-                            KamisadoPlane.this::makePlaneStep,
-                            KamisadoPlane.this::skipPlaneStep
-                    );
+                    //computer's move
+                    Optional<Kamisado.Step> aiStep = game.makeAIStep();
+                    updateBoard(aiStep);
                 } catch (Exception e){
                     e.printStackTrace();
                 }
             }
-
             enableButtons();
         }
 
