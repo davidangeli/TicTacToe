@@ -17,10 +17,13 @@ import tictactoe.games.KamisadoPlane;
 import tictactoe.games.TicTacToe;
 import tictactoe.games.TicTacToePlane;
 
+/**
+ * The Javafx application - user interface of the game.
+ */
 public class Main extends Application {
     //sets the depth of the minimax search on the game trees
     public static final int AIDEPTH = 2;
-    public static final int WIDTH = 400;
+    public static final int WIDTH = 400, HEIGHT = 480;
 
     private Label whosturn;
     private VBox contentBox;
@@ -32,7 +35,7 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) {
 
-        stage.setTitle("Tic-Tac-Toe");
+        stage.setTitle("Tic-Tac-Toe & Kamisado");
         whosturn = new Label("");
         GridPane pane = new GridPane();
         pane.setAlignment(Pos.CENTER);
@@ -41,7 +44,7 @@ public class Main extends Application {
         contentBox.setPadding(new Insets(15, 12, 15, 12));
         contentBox.getChildren().addAll( menuBar, whosturn, pane);
 
-        stage.setScene(new Scene(contentBox, WIDTH+ 24, 480));
+        stage.setScene(new Scene(contentBox, WIDTH+ 24, HEIGHT));
         stage.show();
     }
 

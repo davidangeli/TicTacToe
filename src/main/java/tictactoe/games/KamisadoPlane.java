@@ -10,7 +10,6 @@ import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
-import lombok.EqualsAndHashCode;
 import tictactoe.Player;
 import java.util.LinkedList;
 import java.util.Optional;
@@ -45,9 +44,10 @@ public class KamisadoPlane extends GridPane {
         skipButton = new Button("Skip");
         skipButton.setOnAction(e -> {
             game.skipStep();
-            updateBoard(Optional.empty());
+            updateBoard();
             Optional<Kamisado.Step> aiStep = game.makeAIStep();
-            updateBoard(aiStep);
+            aiStep.ifPresentOrElse(this::updateBoard,this::updateBoard);
+            enableButtons();
         });
         this.add(skipButton, 7, 8, 1, 1);
         enableButtons();
@@ -69,7 +69,8 @@ public class KamisadoPlane extends GridPane {
             if (game.getSteps().isEmpty() || game.getSteps().getLast().getValue().isEmpty() || game.getSteps().getLast().getValue().get().getToFieldColor() == tower.color) {
                 buttons[tower.getI()][tower.getJ()].setDisable(false);
                 buttons[tower.getI()][tower.getJ()].setStyle("-fx-border-color: #f00000; -fx-border-width: 2px;");
-            }}
+            }
+        }
 
         //enable possible target fields and skip button if there's no step
         if (activeTower != null) {
@@ -84,18 +85,21 @@ public class KamisadoPlane extends GridPane {
         }
     }
 
-    //TODO: rethink without the use of Optional<> as parameter
     /**
-     * Making a step on the game's board representation.
+     * Updates information on the board according to the step made.
      * @param step An in-game Step object.
      */
-    private void updateBoard(Optional<Kamisado.Step> step){
-        step.ifPresent( st -> {
-            buttons[st.fromI][st.fromJ].drawTower();
-            buttons[st.toI][st.toJ].drawTower();
-            activeTower = null;
-        });
+    private void updateBoard(Kamisado.Step step){
+        buttons[step.fromI][step.fromJ].drawTower();
+        buttons[step.toI][step.toJ].drawTower();
+        activeTower = null;
+        updateBoard();
+    }
 
+    /**
+     * Second part of updating information on the board, after either a step was made or skipped.
+     */
+    private void updateBoard() {
         game.getWinner().ifPresentOrElse(
                 winner -> whosturn.setText("WINNER: " + winner.toString()),
                 () -> whosturn.setText(game.getWhosTurn().toString())
@@ -105,7 +109,6 @@ public class KamisadoPlane extends GridPane {
     /**
      * This subclass of javafx's Button represents a field on the board.
      */
-    @EqualsAndHashCode(callSuper = true)
     class KamisadoButton extends Button {
         public final int i, j, width;
 
@@ -133,11 +136,11 @@ public class KamisadoPlane extends GridPane {
                     //Player' move
                     Kamisado.Step step = new Kamisado.Step(activeTower.getI(), activeTower.getJ(), i, j);
                     game.makeStep(step, true);
-                    updateBoard(Optional.of(step));
+                    updateBoard(step);
                     if (game.getWinner().isPresent()) return;
                     //computer's move
                     Optional<Kamisado.Step> aiStep = game.makeAIStep();
-                    updateBoard(aiStep);
+                    aiStep.ifPresentOrElse(KamisadoPlane.this::updateBoard, KamisadoPlane.this::updateBoard);
                 } catch (Exception e){
                     e.printStackTrace();
                 }
@@ -145,6 +148,9 @@ public class KamisadoPlane extends GridPane {
             enableButtons();
         }
 
+        /**
+         * Draws a tower if there is one on the field, or clears it if there is not.
+         */
         public void drawTower(){
             Kamisado.Tower tower = game.getTable()[i][j];
             if (tower == null) {
@@ -155,7 +161,6 @@ public class KamisadoPlane extends GridPane {
             Shape towershape;
             if (tower.player == Player.HUMAN) {
                 towershape = new Circle(width/5);
-                //((Circle)towershape).setRadius(width/5);
             }
             else {
                 towershape = new Rectangle(width/2, width/2);

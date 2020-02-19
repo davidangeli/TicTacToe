@@ -15,6 +15,11 @@ public class TicTacToe extends AbstractGame<TicTacToe.Step> {
     private final static int SIZE = 10, WINS = 5, VIABILITYDISTANCE = 1;
     private final int[][] table;
 
+    /**
+     * Creates a TicTactoe game object.
+     * @param starts Sets which Player should start the game.
+     * @param ai Sets the AI instance used for selecting the opponent's steps.
+     */
     public TicTacToe(Player starts, AI ai) {
         super(starts, ai);
         table = new int[SIZE][SIZE];

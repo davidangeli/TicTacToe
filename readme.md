@@ -1,6 +1,10 @@
 # TicTacToe
-This is a basic desktop project that -for starters- impements the fabolous TicTactoe game
-that can be played against the computer. The Kamisado game will be added as a second game option.
+This is a basic desktop project that implements the fabulous TicTactoe  and Kamisado games,
+that can be played against the computer.
 
-#### Technical information:
-Java 13 Maven project, with javafx.
+##### Technical information:
+Java 13 Maven project with javafx.
+
+##### Known issues
+Its not technical, but the computer opponent is basic and flawed, yet.
+

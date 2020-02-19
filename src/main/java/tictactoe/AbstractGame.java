@@ -16,8 +16,6 @@ public abstract class AbstractGame<T> {
     protected Player winner;
     protected AI ai;
 
-    public AbstractGame () {}
-
     public AbstractGame (Player starts, AI ai) {
         this.whosTurn = starts;
         this.ai = ai;

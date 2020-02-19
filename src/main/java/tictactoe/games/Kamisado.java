@@ -3,7 +3,7 @@ package tictactoe.games;
 import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import tictactoe.AI;
 import tictactoe.AbstractGame;
 import tictactoe.Player;
@@ -12,8 +12,7 @@ import java.util.*;
 /**
  * Kamisado class implements the kamisado game.
  */
-@EqualsAndHashCode(callSuper = true)
-@Data
+@Getter
 public class Kamisado extends AbstractGame<Kamisado.Step> {
 
     public static final Color[][] colorMap =  {
@@ -29,6 +28,11 @@ public class Kamisado extends AbstractGame<Kamisado.Step> {
     private final Tower[][] table = new Tower[8][8];
     private final Tower[][] playerTowers = new Tower[2][8];
 
+    /**
+     * Creates a Kamisado game object.
+     * @param starts Sets which Player should start the game.
+     * @param ai Sets the AI instance used for selecting the opponent's steps.
+     */
     public Kamisado (Player starts, AI ai) {
         super(starts, ai);
 
