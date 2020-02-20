@@ -5,7 +5,7 @@ import java.util.Optional;
 /**
  * The AI interface declares the methods we except from an AI implementation.
  */
-public interface AI {
+public interface Opponent {
 
     /**
      * On a given two-player table game, and its current state, this method selects the next step -of the computer, usually.

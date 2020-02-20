@@ -1,6 +1,7 @@
 package tictactoe;
 
 import javafx.util.Pair;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -9,16 +10,14 @@ import java.util.Optional;
  * @param <T> This type parameter represents an in-game step's type.
  */
 
-public abstract class AbstractGame<T> {
+public abstract class AbstractGame<T> implements Serializable {
     protected int score = 0;
     protected final LinkedList<Pair<Player, Optional<T>>> steps = new LinkedList<>();
     protected Player whosTurn;
     protected Player winner;
-    protected AI ai;
 
-    public AbstractGame (Player starts, AI ai) {
+    public AbstractGame (Player starts) {
         this.whosTurn = starts;
-        this.ai = ai;
     }
 
     /**
@@ -100,18 +99,5 @@ public abstract class AbstractGame<T> {
     public void skipStep() {
         steps.add(new Pair<>(whosTurn, Optional.empty()));
         whosTurn = whosTurn.next();
-    }
-
-    /**
-     * This method does one step of the computer, and returns with it.
-     * @return An Optional<Step> that was made.
-     */
-    public Optional<T> makeAIStep() {
-        Optional<T> step = ai.getNextStep(this);
-        step.ifPresentOrElse(
-                st -> makeStep(st, true),
-                this::skipStep
-        );
-        return step;
     }
 }

@@ -4,7 +4,6 @@ import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import lombok.Data;
 import lombok.Getter;
-import tictactoe.AI;
 import tictactoe.AbstractGame;
 import tictactoe.Player;
 import java.util.*;
@@ -31,17 +30,16 @@ public class Kamisado extends AbstractGame<Kamisado.Step> {
     /**
      * Creates a Kamisado game object.
      * @param starts Sets which Player should start the game.
-     * @param ai Sets the AI instance used for selecting the opponent's steps.
      */
-    public Kamisado (Player starts, AI ai) {
-        super(starts, ai);
+    public Kamisado (Player starts) {
+        super(starts);
 
         //set up towers to table's first (COMPUTER) and last (HUMAN) row, with colors matching the colormap
             for (int j = 0; j < 8; j++) {
-                table[0][j] = new Tower(colorMap[0][j], Player.COMPUTER, 0, j);
-                table[7][j] = new Tower(colorMap[7][j], Player.HUMAN, 7, j);
-                playerTowers[Player.COMPUTER.ordinal()][j] = table[0][j] ;
-                playerTowers[Player.HUMAN.ordinal()][j] = table[7][j] ;
+                table[0][j] = new Tower(colorMap[0][j], Player.OPPONENT, 0, j);
+                table[7][j] = new Tower(colorMap[7][j], Player.PLAYER, 7, j);
+                playerTowers[Player.OPPONENT.ordinal()][j] = table[0][j] ;
+                playerTowers[Player.PLAYER.ordinal()][j] = table[7][j] ;
             }
     }
 
@@ -66,7 +64,7 @@ public class Kamisado extends AbstractGame<Kamisado.Step> {
     protected AbstractGame<Kamisado.Step> getNextState(Kamisado.Step step) throws IllegalArgumentException {
 
         Player pl = steps.isEmpty() ? whosTurn : steps.getFirst().getKey();
-        Kamisado nextState = new Kamisado(pl, ai);
+        Kamisado nextState = new Kamisado(pl);
 
         //Kamisado Steps have only final primitive members
         steps.forEach(s -> s.getValue().ifPresentOrElse(
@@ -109,7 +107,7 @@ public class Kamisado extends AbstractGame<Kamisado.Step> {
         return result;
 
         // else
-        int dir = whosTurn == Player.COMPUTER ? 1 : -1;
+        int dir = whosTurn == Player.OPPONENT ? 1 : -1;
         int i, j;
         // diagonal 1
         i = tower.getI() + dir;
@@ -142,8 +140,8 @@ public class Kamisado extends AbstractGame<Kamisado.Step> {
 
         for (Player pl : Player.values()) {
 
-            int x = pl == Player.COMPUTER ? 1 : -1;
-            int goal = pl == Player.COMPUTER ? 7 : 0;
+            int x = pl == Player.OPPONENT ? 1 : -1;
+            int goal = pl == Player.OPPONENT ? 7 : 0;
             int distr = 4;
             //valuation based on towers' row positions
             for (Tower tower : playerTowers[pl.ordinal()]) {

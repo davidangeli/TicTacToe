@@ -1,7 +1,6 @@
 package tictactoe.games;
 
 import javafx.util.Pair;
-import tictactoe.AI;
 import tictactoe.AbstractGame;
 import tictactoe.Player;
 import java.util.LinkedList;
@@ -18,10 +17,9 @@ public class TicTacToe extends AbstractGame<TicTacToe.Step> {
     /**
      * Creates a TicTactoe game object.
      * @param starts Sets which Player should start the game.
-     * @param ai Sets the AI instance used for selecting the opponent's steps.
      */
-    public TicTacToe(Player starts, AI ai) {
-        super(starts, ai);
+    public TicTacToe(Player starts) {
+        super(starts);
         table = new int[SIZE][SIZE];
     }
 
@@ -45,7 +43,7 @@ public class TicTacToe extends AbstractGame<TicTacToe.Step> {
     protected AbstractGame<Step> getNextState(Step step) throws IllegalArgumentException {
 
         Player pl = steps.isEmpty() ? whosTurn : steps.getFirst().getKey();
-        TicTacToe nextState = new TicTacToe(pl, ai);
+        TicTacToe nextState = new TicTacToe(pl);
 
         //TicTacToe Steps have only final primitive members
         steps.forEach(s -> s.getValue().ifPresentOrElse(
@@ -122,13 +120,18 @@ public class TicTacToe extends AbstractGame<TicTacToe.Step> {
         //checks 3 steps back from the winning length, and weights with 10000, 100, 1
         score = 0;
         for (int i = 0; i < 3; i++) {
-            score += series[Player.COMPUTER.ordinal()+1][WINS-i] * (int)Math.pow(10,4-2*i);
-            score -= series[Player.HUMAN.ordinal()+1][WINS-i] * (int)Math.pow(10,4-2*i);
+            score += series[Player.OPPONENT.ordinal()+1][WINS-i] * (int)Math.pow(10,4-2*i);
+            score -= series[Player.PLAYER.ordinal()+1][WINS-i] * (int)Math.pow(10,4-2*i);
         }
 
-        //update winner field if won
-        if (series[Player.COMPUTER.ordinal()+1][WINS] != 0 && winner == null) winner = Player.COMPUTER;
-        if (series[Player.HUMAN.ordinal()+1][WINS] != 0 && winner == null) winner = Player.HUMAN;
+        //update winner field if won by the previous Player
+        Player pl = whosTurn.next();
+        if (winner != null) return;
+        int j = WINS;
+        while (j < series[pl.ordinal()+1].length && series[pl.ordinal()+1][j] == 0) {
+            j++;
+        }
+        if (j < series[pl.ordinal()+1].length) winner = pl;
     }
 
     /**

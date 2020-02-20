@@ -4,8 +4,8 @@ package tictactoe;
  * Enum used for player identification.
  */
 public enum Player {
-    COMPUTER,
-    HUMAN;
+    OPPONENT,
+    PLAYER;
 
     private final static Player[] vals = values();
 

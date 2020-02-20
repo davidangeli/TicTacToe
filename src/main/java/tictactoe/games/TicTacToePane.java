@@ -9,6 +9,7 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import lombok.EqualsAndHashCode;
+import tictactoe.Opponent;
 import tictactoe.Player;
 import java.util.Optional;
 
@@ -16,24 +17,26 @@ import java.util.Optional;
  * Graphical interface for the TicTactoe Game. Extends javafx's GridPane.
  * Represents the game's table as a grid of buttons.
  */
-public class TicTacToePlane extends GridPane {
+public class TicTacToePane extends GridPane {
     private final TicTacToe game;
-    private final Label whosturn;
+    private final Opponent opponent;
+    private final Label whosturn = new Label("");
     private final TicTacToeButton[][] buttons;
 
-    public TicTacToePlane(TicTacToe game, Label whosturn, int width){
+    public TicTacToePane(TicTacToe game, Opponent opponent, int width){
         setHgap(1);
         setVgap(1);
         this.game = game;
-        this.whosturn = whosturn;
+        this.opponent = opponent;
         this.whosturn.setText(game.getWhosTurn().toString());
         int size = game.getSize();
+        this.add(whosturn, 0, 0, size, 1);
         this.buttons = new TicTacToeButton[size][size];
         for (int i=0; i<size; i++){
             for (int j=0; j<size; j++){
-                TicTacToeButton button = new TicTacToeButton(new TicTacToe.Step(i,j), width/size -1);
+                TicTacToeButton button = new TicTacToeButton(new TicTacToe.Step(i,j), width/(size+1));
                 buttons[i][j] = button;
-                this.add(button, j, i, 1, 1);
+                this.add(button, j, i+1, 1, 1);
             }
         }
     }
@@ -42,8 +45,9 @@ public class TicTacToePlane extends GridPane {
      * Making a step on the game's board representation.
      * @param step An in-game Step object.
      */
-    private void updateBoard(TicTacToe.Step step){
-        String mark = game.getWhosTurn() == Player.COMPUTER ? "O" : "X";
+    private void makeBoardStep(TicTacToe.Step step){
+        game.makeStep(step, true);
+        String mark = game.getWhosTurn() == Player.OPPONENT ? "X" : "O";
         buttons[step.i][step.j].setText(mark);
         game.getWinner().ifPresentOrElse(
                 winner -> whosturn.setText("WINNER: " + winner.toString()),
@@ -71,12 +75,11 @@ public class TicTacToePlane extends GridPane {
 
             try {
                 //Player' move
-                game.makeStep(step, true);
-                updateBoard(step);
+                makeBoardStep(step);
                 if (game.getWinner().isPresent()) return;
                 //Computer's move - no step option is not really possible in TicTacToe
-                Optional<TicTacToe.Step> step2 = game.makeAIStep();
-                step2.ifPresent(TicTacToePlane.this::updateBoard);
+                Optional<TicTacToe.Step> step2 = opponent.getNextStep(game);
+                step2.ifPresent(TicTacToePane.this::makeBoardStep);
             } catch (IllegalArgumentException e){
                 e.printStackTrace();
             }

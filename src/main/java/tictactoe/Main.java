@@ -4,7 +4,6 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -13,9 +12,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tictactoe.ai.MiniMaxAI;
 import tictactoe.games.Kamisado;
-import tictactoe.games.KamisadoPlane;
+import tictactoe.games.KamisadoPane;
 import tictactoe.games.TicTacToe;
-import tictactoe.games.TicTacToePlane;
+import tictactoe.games.TicTacToePane;
 
 /**
  * The Javafx application - user interface of the game.
@@ -25,7 +24,7 @@ public class Main extends Application {
     public static final int AIDEPTH = 2;
     public static final int WIDTH = 400, HEIGHT = 480;
 
-    private Label whosturn;
+    private Opponent opponent = new MiniMaxAI(AIDEPTH);
     private VBox contentBox;
 
     public static void main(String[] args) {
@@ -36,13 +35,12 @@ public class Main extends Application {
     public void start(Stage stage) {
 
         stage.setTitle("Tic-Tac-Toe & Kamisado");
-        whosturn = new Label("");
         GridPane pane = new GridPane();
         pane.setAlignment(Pos.CENTER);
         MenuBar menuBar = setMenuBar();
         contentBox = new VBox(20);
         contentBox.setPadding(new Insets(15, 12, 15, 12));
-        contentBox.getChildren().addAll( menuBar, whosturn, pane);
+        contentBox.getChildren().addAll( menuBar, pane);
 
         stage.setScene(new Scene(contentBox, WIDTH+ 24, HEIGHT));
         stage.show();
@@ -53,14 +51,14 @@ public class Main extends Application {
 
         MenuItem menuItem1 = new MenuItem("TicTacToe");
         menuItem1.setOnAction(e -> {
-            GridPane pane = new TicTacToePlane(new TicTacToe(Player.HUMAN, new MiniMaxAI(AIDEPTH)), whosturn, WIDTH);
+            GridPane pane = new TicTacToePane(new TicTacToe (Player.PLAYER), opponent, WIDTH);
             pane.setAlignment(Pos.CENTER);
-            contentBox.getChildren().set(2, pane);
+            contentBox.getChildren().set(1, pane);
         });
         MenuItem menuItem2 = new MenuItem("Kamisado");
         menuItem2.setOnAction(e -> {
-            KamisadoPlane pane = new KamisadoPlane(new Kamisado (Player.HUMAN, new MiniMaxAI(AIDEPTH)), whosturn, WIDTH);
-            contentBox.getChildren().set(2, pane);
+            KamisadoPane pane = new KamisadoPane(new Kamisado (Player.PLAYER), opponent, WIDTH);
+            contentBox.getChildren().set(1, pane);
             pane.setAlignment(Pos.CENTER);
         });
 
@@ -70,4 +68,5 @@ public class Main extends Application {
         menuBar.getMenus().add(menu);
         return menuBar;
     }
+
 }

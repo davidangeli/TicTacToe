@@ -1,30 +1,34 @@
 import org.junit.jupiter.api.Test;
+import tictactoe.Opponent;
 import tictactoe.ai.MiniMaxAI;
 import tictactoe.Player;
 import tictactoe.games.TicTacToe;
-
+import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+//TODO: implement again reasonably
 
 public class AITest {
-    private static final int AIDEPTH = 3;
 
     @Test
     public void testAI() {
-        TicTacToe mygame = new TicTacToe(Player.HUMAN, new MiniMaxAI(2));
-        int size = mygame.getSize();
+        TicTacToe game = new TicTacToe(Player.PLAYER);
+        Opponent opponent = new MiniMaxAI(2);
+        int size = game.getSize();
 
         //1 imitate human step, then an ai step
-        mygame.makeStep(new TicTacToe.Step(size/2 - 1,size/2 - 1), true);
-        mygame.makeAIStep();
+        game.makeStep(new TicTacToe.Step(size/2 - 1,size/2 - 1), true);
+        Optional<TicTacToe.Step> aistep = opponent.getNextStep(game);
+        aistep.ifPresent(st -> game.makeStep(st, true));
 
         //2-3-4-5
         for (int i = 0; i < 5; i++) {
-            mygame.makeStep(mygame.getNextSteps().getLast(), true);
-            mygame.makeAIStep();
+            game.makeStep(game.getNextSteps().getLast(), true);
+            aistep = opponent.getNextStep(game);
+            aistep.ifPresent(st -> game.makeStep(st, true));
         }
 
-        assertEquals(mygame.getSteps().element().getValue().get(), new TicTacToe.Step(size/2 - 1,size/2 - 1));
-        assertEquals(12, mygame.getSteps().size());
+        assertEquals(game.getSteps().element().getValue().get(), new TicTacToe.Step(size/2 - 1,size/2 - 1));
+        assertEquals(12, game.getSteps().size());
     }
 
 }

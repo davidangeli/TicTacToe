@@ -1,6 +1,6 @@
 package tictactoe.ai;
 
-import tictactoe.AI;
+import tictactoe.Opponent;
 import tictactoe.AbstractGame;
 import tictactoe.Player;
 import java.util.Comparator;
@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Class implementing the AI interface with the classic miniMax solution.
  */
-public class MiniMaxAI implements AI {
+public class MiniMaxAI implements Opponent {
     private final int depth;
 
     public MiniMaxAI(int depth) {
@@ -40,10 +40,10 @@ public class MiniMaxAI implements AI {
 
         if (rDepth == 0) return state.getScore();
 
-        int minmax = (state.getWhosTurn() == Player.COMPUTER) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+        int minmax = (state.getWhosTurn() == Player.OPPONENT) ? Integer.MIN_VALUE : Integer.MAX_VALUE;
 
         for (AbstractGame<T> st : state.getNextStates()) {
-            if (state.getWhosTurn() == Player.COMPUTER) {
+            if (state.getWhosTurn() == Player.OPPONENT) {
                 minmax = Math.max (minmax, minimaxStep(st,rDepth-1));
             }
             else {
