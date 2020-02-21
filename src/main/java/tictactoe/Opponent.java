@@ -1,6 +1,8 @@
 package tictactoe;
 
+import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 /**
  * The AI interface declares the methods we except from an AI implementation.
@@ -13,6 +15,8 @@ public interface Opponent {
      * @param <T> The type parameter defining an in-game step.
      * @return Optional<T>. I it's empty, that means the method was not able to chose a step.
      */
-    <T> Optional<T> getNextStep(AbstractGame<T> state);
+    <T> Optional<T> getNextStep(AbstractGame<T> state) throws IOException, TimeoutException, ClassNotFoundException;
+
+    void discard() throws IOException;
 
 }

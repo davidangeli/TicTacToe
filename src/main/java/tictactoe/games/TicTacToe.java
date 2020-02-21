@@ -3,6 +3,7 @@ package tictactoe.games;
 import javafx.util.Pair;
 import tictactoe.AbstractGame;
 import tictactoe.Player;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Optional;
 
@@ -35,6 +36,10 @@ public class TicTacToe extends AbstractGame<TicTacToe.Step> {
                     if (isAStepViable(step)) result.add(step);
                 }
             }
+        }
+        //first move
+        if (result.isEmpty() && this.steps.isEmpty()) {
+            result.add(new Step(SIZE/2, SIZE/2));
         }
         return result;
     }
@@ -97,7 +102,7 @@ public class TicTacToe extends AbstractGame<TicTacToe.Step> {
     /**
      * This nested class represents an in game step, with two integers meaning row and column.
      */
-    public static class Step {
+    public static class Step implements Serializable {
         public final int i, j;
         public Step (int i, int j){
             this.i=i;

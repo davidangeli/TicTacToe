@@ -5,34 +5,28 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Circle;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
+import tictactoe.AbstractGamePane;
 import tictactoe.Opponent;
 import tictactoe.Player;
 import java.util.LinkedList;
-import java.util.Optional;
 
 /**
  * Graphical interface for the Kamisado Game. Extends javafx's GridPane.
  * Represents the game's table as a grid of buttons. Size is always 8x8.
  */
-public class KamisadoPane extends GridPane {
-    private final Kamisado game;
-    private final Opponent opponent;
-    private final Label whosturn = new Label("");
+public class KamisadoPane extends AbstractGamePane<Kamisado, Kamisado.Step> {
     private final KamisadoButton[][] buttons = new KamisadoButton[8][8];
     private final Button skipButton;
     private Kamisado.Tower activeTower = null;
 
     public KamisadoPane(Kamisado game, Opponent opponent, int width){
+        super(game, opponent);
         setHgap(2);
         setVgap(2);
-        this.game = game;
-        this.opponent = opponent;
-        this.whosturn.setText(game.getWhosTurn().toString());
         this.add(whosturn, 0, 0, 8, 1);
         //kamisado field buttons
         for (int i=0; i<8; i++){
@@ -47,25 +41,21 @@ public class KamisadoPane extends GridPane {
         skipButton = new Button("Skip");
         skipButton.setOnAction(e -> {
             skipBoardStep();
-            Optional<Kamisado.Step> aiStep = opponent.getNextStep(game);
-            aiStep.ifPresentOrElse(KamisadoPane.this::makeBoardStep, KamisadoPane.this::skipBoardStep);
-            enableButtons();
+            opponentsMove();
         });
-        this.add(skipButton, 7, 8, 1, 1);
+        this.add(skipButton, 7, 9, 1, 1);
         enableButtons();
     }
 
-    /**
-     * Controls which fields are enabled for the player, according to the game's actual standing.
-     */
-    private void enableButtons(){
+    @Override
+    protected void enableButtons(){
         //disable all
         this.getChildren().forEach(c -> {
             if (c.getClass().equals(Label.class)) {return;}
             c.setDisable(true);
             c.setStyle("");
         });
-        if (game.getWinner().isPresent()) return;
+        if (game.getWinner().isPresent() || game.getWhosTurn() == Player.OPPONENT) return;
 
         //enable towers if color matches last step, or first move
         for (Kamisado.Tower tower : game.getPlayerTowers()[Player.PLAYER.ordinal()]) {
@@ -88,11 +78,8 @@ public class KamisadoPane extends GridPane {
         }
     }
 
-    /**
-     * Updates information on the board according to the step made.
-     * @param step An in-game Step object.
-     */
-    private void makeBoardStep(Kamisado.Step step){
+    @Override
+    protected void makeBoardStep(Kamisado.Step step){
         game.makeStep(step, true);
         buttons[step.fromI][step.fromJ].drawTower();
         buttons[step.toI][step.toJ].drawTower();
@@ -101,18 +88,18 @@ public class KamisadoPane extends GridPane {
                 winner -> whosturn.setText("WINNER: " + winner.toString()),
                 () -> whosturn.setText(game.getWhosTurn().toString())
         );
+        enableButtons();
     }
 
-    /**
-     * Second part of updating information on the board, after either a step was made or skipped.
-     */
-    private void skipBoardStep() {
+    @Override
+    protected void skipBoardStep() {
         game.skipStep();
         activeTower = null;
         game.getWinner().ifPresentOrElse(
                 winner -> whosturn.setText("WINNER: " + winner.toString()),
                 () -> whosturn.setText(game.getWhosTurn().toString())
         );
+        enableButtons();
     }
 
     /**
@@ -141,18 +128,12 @@ public class KamisadoPane extends GridPane {
             }
             // move a tower
             else {
-                try {
-                    //Player' move
-                    Kamisado.Step step = new Kamisado.Step(activeTower.getI(), activeTower.getJ(), i, j);
-                    makeBoardStep(step);
-                    if (game.getWinner().isPresent()) return;
-                    //computer's move
-
-                    Optional<Kamisado.Step> aiStep = opponent.getNextStep(game);
-                    aiStep.ifPresentOrElse(KamisadoPane.this::makeBoardStep, KamisadoPane.this::skipBoardStep);
-                } catch (Exception e){
-                    e.printStackTrace();
-                }
+                //Player' move
+                Kamisado.Step step = new Kamisado.Step(activeTower.getI(), activeTower.getJ(), i, j);
+                makeBoardStep(step);
+                if (game.getWinner().isPresent()) return;
+                //computer's move
+                opponentsMove();
             }
             enableButtons();
         }

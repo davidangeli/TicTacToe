@@ -1,4 +1,4 @@
-package tictactoe.ai;
+package tictactoe.opponent;
 
 import tictactoe.Opponent;
 import tictactoe.AbstractGame;
@@ -21,6 +21,7 @@ public class MiniMaxAI implements Opponent {
      * @param state The actual game state on which the computer gets the next step.
      * @return Selected step. Empty if can not move.
      */
+    @Override
     public <T> Optional<T> getNextStep (AbstractGame<T> state) {
 
         Optional<AbstractGame<T>> nextstate = state.getNextStates().parallelStream()
@@ -28,6 +29,11 @@ public class MiniMaxAI implements Opponent {
 
         if (nextstate.isEmpty()) return Optional.empty();
         return nextstate.get().getSteps().getLast().getValue();
+    }
+
+    @Override
+    public void discard() {
+
     }
 
     /**
