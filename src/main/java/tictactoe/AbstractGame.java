@@ -9,7 +9,6 @@ import java.util.Optional;
  * An abstract class of a two player board game.
  * @param <T> This type parameter represents an in-game step's type.
  */
-
 public abstract class AbstractGame<T> implements Serializable {
     protected int score = 0;
     protected final LinkedList<Pair<Player, Optional<T>>> steps = new LinkedList<>();
@@ -99,5 +98,6 @@ public abstract class AbstractGame<T> implements Serializable {
     public void skipStep() {
         steps.add(new Pair<>(whosTurn, Optional.empty()));
         whosTurn = whosTurn.next();
+
     }
 }

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import tictactoe.AbstractGame;
 import tictactoe.Player;
+import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -58,7 +59,6 @@ public class Kamisado extends AbstractGame<Kamisado.Step> {
         }
         return result;
     }
-
 
     @Override
     protected AbstractGame<Kamisado.Step> getNextState(Kamisado.Step step) throws IllegalArgumentException {
@@ -166,7 +166,7 @@ public class Kamisado extends AbstractGame<Kamisado.Step> {
      * This class represents a tower in game, with two integers meaning row and column.
      */
     @Data
-    static class Tower {
+    static class Tower implements Serializable {
         public final Color color;
         public final Player player;
         private int i, j;
@@ -182,7 +182,7 @@ public class Kamisado extends AbstractGame<Kamisado.Step> {
      * This nested class represents an in game step, with two integers meaning row and column.
      */
     @Data
-    static class Step {
+    static class Step implements Serializable{
         public final int fromI, toI, fromJ, toJ;
         Step (int fromI, int fromJ, int toI, int toJ) {
             this.fromI = fromI;
