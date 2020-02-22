@@ -17,6 +17,6 @@ public interface Opponent {
      */
     <T> Optional<T> getNextStep(AbstractGame<T> state) throws IOException, TimeoutException, ClassNotFoundException;
 
-    void discard() throws IOException;
+    void discard();
 
 }

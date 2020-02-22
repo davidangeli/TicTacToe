@@ -4,10 +4,12 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import tictactoe.opponent.MiniMaxAI;
@@ -28,6 +30,7 @@ public class Main extends Application {
 
     private Opponent opponent;
     private VBox contentBox;
+    private Label statusMsg;
     private MenuBar menuBar;
     private Menu gameMenu;
     private Menu opponentMenu;
@@ -43,15 +46,20 @@ public class Main extends Application {
         GridPane pane = new GridPane();
         pane.setAlignment(Pos.CENTER);
         setMenuBar();
+        statusMsg = new Label("");
+
         contentBox = new VBox(20);
         contentBox.setPadding(new Insets(15, 12, 15, 12));
-        contentBox.getChildren().addAll( menuBar, pane);
+        contentBox.getChildren().addAll( menuBar, pane, statusMsg);
+        contentBox.setVgrow(pane, Priority.ALWAYS);
 
         stage.setScene(new Scene(contentBox, WIDTH+ 24, HEIGHT));
         stage.show();
+        setStatusMsg("Enjoy.");
     }
 
     private void setMenuBar () {
+        // currently, if the player creates the game, the opponent starts
         gameMenu = new Menu("Game");
         MenuItem menuItem1 = new MenuItem("TicTacToe");
         menuItem1.setOnAction(e -> setGame(menuItem1.getText(), Player.OPPONENT));
@@ -64,7 +72,7 @@ public class Main extends Application {
         MenuItem menuItem4 = new MenuItem("Remote - my game");
         menuItem4.setOnAction(e -> setOpponent(menuItem4.getText()));
         MenuItem menuItem5 = new MenuItem("Remote - their game");
-        menuItem5.setOnAction(e -> setOpponent(menuItem4.getText()));
+        menuItem5.setOnAction(e -> setOpponent(menuItem5.getText()));
 
         gameMenu.getItems().add(menuItem1);
         gameMenu.getItems().add(menuItem2);
@@ -79,7 +87,12 @@ public class Main extends Application {
         menuBar.getMenus().add(opponentMenu);
     }
 
-    private void setGame(String name, Player whostarts){
+    /**
+     *
+     * @param name
+     * @param whostarts
+     */
+    private void setGame(String name, Player whostarts) {
         AbstractGamePane pane;
         AbstractGame game;
         switch (name) {
@@ -102,7 +115,7 @@ public class Main extends Application {
         if (opponent instanceof RemoteOpponent && whostarts == Player.OPPONENT) {
 
             try {
-                ((RemoteOpponent) opponent).sendGame(game);
+                ((RemoteOpponent) opponent).sendGameInfo(game);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -112,37 +125,53 @@ public class Main extends Application {
     }
 
     private void setOpponent(String name) {
+        if ( opponent != null ) opponent.discard();
+        gameMenu.setDisable(true);
+
         switch (name) {
             case "Computer":
-                try {
-                    if ( opponent != null ) opponent.discard();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 opponent = new MiniMaxAI(AIDEPTH);
                 gameMenu.setDisable(false);
                 break;
             case "Remote - my game":
-                try {
-                    if ( opponent != null ) opponent.discard();
-                    opponent = new RemoteOpponent();
-                    gameMenu.setDisable(false);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                setStatusMsg("Setting up connection...");
+                opponent = new RemoteOpponent(Player.PLAYER);
+                ((RemoteOpponent)opponent).init(this);
                 break;
             case "Remote - their game":
-                try {
-                    if ( opponent != null ) opponent.discard();
-                    opponent = new RemoteOpponent();
-                    gameMenu.setDisable(true);
-                    Class<? extends AbstractGame> cl = ((RemoteOpponent)opponent).receiveClass();
-                    setGame(cl.getName(), Player.PLAYER);
-                } catch (IOException | ClassNotFoundException e) {
-                    e.printStackTrace();
-                }
+                setStatusMsg("Setting up connection...");
+                opponent = new RemoteOpponent(Player.OPPONENT);
+                ((RemoteOpponent)opponent).init(this);
                 break;
         }
+    }
+
+    public synchronized void gotRemoteOpponent(Player whoserves) {
+        if (whoserves == Player.PLAYER) {
+            gameMenu.setDisable(false);
+        }
+        else {
+            try {
+                Class<? extends AbstractGame> cl = ((RemoteOpponent)opponent).receiveGameInfo();
+                setGame(cl.getName(), Player.PLAYER);
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        setStatusMsg("Remote opponent setup done.");
+    }
+
+    public synchronized void failedRemoteOpponent() {
+        setStatusMsg("Remote opponent setup failed.");
+    }
+
+    public synchronized void setStatusMsg(String msg) {
+        statusMsg.setText(msg);
+    }
+
+    @Override
+    public void stop() {
+        if ( opponent != null ) opponent.discard();
     }
 
 }
